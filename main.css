@@ -1,0 +1,28 @@
+#header-nav{
+	background-color: #410E7E;
+}
+#header-nav a.navbar-brand{
+	color: white;
+}
+
+div.sidebar{
+
+}
+.nav>li>a{
+
+}
+
+/* LOGIN PAGE */
+
+#login-page{
+	background-color: blue;
+}
+#login-page .main{
+	width: 50%;
+	background-color: white;
+	display: block;
+	margin: 100px auto;
+	border: 1px solid black;
+	border-radius: 5px;
+	padding: 20px;
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Byron Katie Admin Login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,400,300,600,700' type='text/css'>
+    <link rel="stylesheet" href="main.css"/>
+    <!--STAMPLAY SDK -->
+    <script src="//drrjhlchpvi7e.cloudfront.net/libs/stamplay-js-sdk/2.0.6/stamplay.min.js"></script>
+</head>
+<body id="login-page">
+     <div class="main">
+        <div class="login-form">
+            <h1>Kurbi Provider Admin Login</h1>
+            <div class="head">
+            </div>
+            <form onsubmit="return login()">
+                <input type="text" class="text" id="email" value="Email" onfocus="if(this.value == 'Email'){this.value='';}">
+                <input type="password" value="Password" id="password" onfocus="if(this.value == 'Password'){this.value='';}">
+                <div class="submit">
+                    <input type="submit" value="Log In" >
+                </div>
+            </form>
+            <br />
+        </div>
+         <!-- start-copyright -->
+        <div class="copy-right">
+            <p>Copyright by Kurbi<sup>&copy;</sup></p>
+        </div>
+        <!-- end-copyright -->
+    </div>
+    <script type="application/x-javascript">
+        // STAMPLAY INIT
+        Stamplay.init('kurbi');
+
+        // SET UP LOGIN FUNCTION
+        function login(){
+            var username = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            Stamplay.User.login({
+                email : username,
+                password: password
+            }).then(function(res) {
+                // NOTE: the Stamplay SDK saves the jwt token to localStorage using the root url + '-jwt' as the key. EXAMPLE: "http://ngadmin-jwt": [token]
+                // save user values to localStorage
+                window.localStorage.setItem('user', res);
+                // redirect to the home page of the admin app
+                window.location.href = "./index.html";
+            }), function(err) {
+                console.log(err);
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>

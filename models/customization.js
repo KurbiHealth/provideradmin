@@ -3,6 +3,7 @@ module.exports = function(nga,customization) {
     // LIST VIEW
     customization.listView()
     .fields([
+        nga.field('id'),
         nga.field('dt_create')
             .label('Created'),
         nga.field('chat_avatar'),

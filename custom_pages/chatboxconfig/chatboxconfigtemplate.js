@@ -1,7 +1,7 @@
 module.exports = function() {
 
     var chatboxConfigControllerTemplate =
-        '<style>input{margin-bottom:10px;}</style>' +
+        '<style>input{margin-bottom:10px;}.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;-ms-word-break: break-all;word-break: break-all;word-break: break-word;}</style>' +
         '<div class="row"><div class="col-lg-12">' +
             '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' +
             '<div class="page-header">' +
@@ -18,8 +18,10 @@ module.exports = function() {
                 '<a class="btn btn-default" ng-click="controller.submitForm()">Save</a>' + 
             '</div>' +
             '<div class="col-lg-6">' +
-                '<h4>Snippet</h4>' +
-                '<div id="chatSnippet" style="width:100%;display:block;"></div>' +
+                '<h4>Instructions</h4>' +
+                '<p><i>When the snippet appears, copy it and then paste it into your website\'s html or content management system.</i></p>' +
+                '<h4>Snippet Display</h4>' +
+                '<div id="chatSnippet" class="dont-break-out" style="width:100%;display:block;border:1px solid grey;border-radius:3px;min-height:33px;padding:20px;margin-bottom:20px;"></div>' +
             '</div>' +
         '</div>';
 

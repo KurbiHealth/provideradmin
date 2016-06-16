@@ -4,7 +4,8 @@ module.exports = function(nga,chatroom) {
     chatroom.listView()
     .fields([
         nga.field('dt_create','datetime')
-            .label('Created')
+            .label('Created'),
+        nga.field('id')
     ])
     .listActions(['show','edit','delete']);
 
@@ -16,24 +17,27 @@ module.exports = function(nga,chatroom) {
             .label('Created'),
         nga.field('dt_update')
             .label('Last Updated'),
-        nga.field('chat_avatar'),
-        nga.field('chat_color'),
-        nga.field('chat_headline'),
-        nga.field('chat_snippet'),
-        nga.field('chat_url')
+        nga.field('key'),
+        nga.field('room'),
+        nga.field('sessionID'),
+        nga.field('messages','embedded_list') // Define a 1-N relationship with the (embedded) comment entity
+          .targetFields([ // which comment fields to display in the datagrid / form
+              nga.field('dt_create','datetime').label('Posted'),
+              nga.field('url')
+          ])
         // relate concept
     ])
 
     // CREATION VIEW
     chatroom.creationView()
     .fields([
-        nga.field('chat_avatar','file')
+        nga.field('key')
             //.uploadInformation({ 'url': 'your_url', 'apifilename': 'picture_name' })
             ,
-        nga.field('chat_color'),
-        nga.field('chat_headline'),
-        nga.field('chat_snippet'),
-        nga.field('chat_url')
+        nga.field('messages'),
+        nga.field('room'),
+        nga.field('sessionID'),
+        nga.field('url')
     ])
 
     // EDITION VIEW

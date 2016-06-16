@@ -96,25 +96,52 @@ myApp.config(function(RestangularProvider) {
         //console.log('headers: ',headers);
         //console.log('params: ',params);
         //console.log('httpConfig',httpConfig);
-        return { element: element, params: {} };
+
+        // FIX PAGINATION
+        // STAMPLAY'S FORMAT == n=21&page=2&per_page=10
+console.log('request operation,',operation);
+console.log('request what,',what);
+        if (operation == 'getList') {
+            params.page = params._page;
+            params.per_page = params._perPage;
+            if(params._sortField != ''){
+                params.sort = '';
+                if(params._sortDir == 'DESC') params.sort = '-';
+                 params.sort += params._sortField;
+            }
+            delete params._page;
+            delete params._perPage;
+            delete params._sortField;
+            delete params._sortDir;
+        }
+console.log('params',params);
+        return { element: element, params: params };
     });
 
     RestangularProvider.addResponseInterceptor(function(data,operation,what,url,response,deferred){
 
         var newResponse;
-        //console.log('Response',response);
+        console.log('Response',response);
         //console.log(typeof response.data.data);
+        console.log('Data',data);
 
+        // ADJUST STAMPLAY'S STRUCTURE TO MATCH WHAT NG-ADMIN EXPECTS
         if('data' in response.data){
-            var data = response.data.data;
-            if(data.length > 0){
+            var newData = response.data.data;
+            if(newData.length > 0){
                 newResponse = response.data.data;
             }else{
                 newResponse = [];
             }
-        }
-        else{
+        }else{
             newResponse = response.data;
+        }
+
+        // FIX PAGINATION
+        if (operation == "getList") {
+            var contentRange = data.pagination.total_elements;
+console.log(contentRange);
+            response.totalCount = contentRange;
         }
         
         return newResponse;
@@ -135,7 +162,7 @@ myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
 // CHATBOX CUSTOMIZATION PAGE
 var chatboxConfigController = require('./custom_pages/chatboxconfig/chatboxconfig')();
 var chatboxConfigControllerTemplate = require('./custom_pages/chatboxconfig/chatboxconfigtemplate')();
-myApp.config(function ($stateProvider) {
+myApp.config(function($stateProvider) {
     $stateProvider.state('chatbox-config', {
         parent: 'main',
         url: '/chatbox_config',
@@ -212,11 +239,10 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
     admin.menu(nga.menu()
         .addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard'))
         .addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;'))
-        .addChild(nga.menu().title('Chat Box').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')
-            .addChild(nga.menu(nga.entity('chatbox')).title('ChatBoxes').icon('<span class="glyphicon glyphicon-list"></span>&nbsp;'))
-            .addChild(nga.menu(nga.entity('chatroom')).title('ChatRooms').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
-            .addChild(nga.menu(nga.entity('customization')).title('Customized ChatBoxes').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
-            .addChild(nga.menu().title('Customization Form').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))
+        .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')
+            .addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu(nga.entity('customization')).title('ChatBox History').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu().title('ChatBox Customize').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))
         )
     );
 

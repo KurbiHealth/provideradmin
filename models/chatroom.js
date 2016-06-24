@@ -5,9 +5,11 @@ module.exports = function(nga,chatroom) {
     .fields([
         nga.field('dt_create','datetime')
             .label('Created'),
-        nga.field('id')
+        nga.field('messages','obj_key_value_field')
+            .label('')
+            .keyValueChoices('{"qCode":"back pain details"}')
     ])
-    .listActions(['show','edit','delete']);
+    .listActions(['show']);
 
     // SHOW VIEW
     chatroom.showView()
@@ -20,12 +22,17 @@ module.exports = function(nga,chatroom) {
         nga.field('key'),
         nga.field('room'),
         nga.field('sessionID'),
-        nga.field('messages','embedded_list') // Define a 1-N relationship with the (embedded) comment entity
-          .targetFields([ // which comment fields to display in the datagrid / form
-              nga.field('dt_create','datetime').label('Posted'),
-              nga.field('url')
-          ])
-        // relate concept
+        nga.field('messages','stamplay_array_str')
+            .targetFields([
+                nga.field('source'),
+                nga.field('message.body.text')
+            ])
+            .jsonParse(true)
+            .fieldValueStyles('[{"fieldName":"source", "value":"patient", "cssClass":"chat-message-source-patient"}]')
+        //,nga.field('messages','json')
+        ,nga.field('custom_action')
+            .label('')
+            .template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>')
     ])
 
     // CREATION VIEW

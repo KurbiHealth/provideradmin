@@ -140,7 +140,7 @@ console.log('params',params);
         // FIX PAGINATION
         if (operation == "getList") {
             var contentRange = data.pagination.total_elements;
-console.log(contentRange);
+console.log('num of entries retrieved by Restangular',contentRange);
             response.totalCount = contentRange;
         }
         
@@ -150,6 +150,7 @@ console.log(contentRange);
 
 });
 
+  
 /***************************************
  * CUSTOM PAGES
  * ----
@@ -160,8 +161,8 @@ myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
 //myApp.constant('chatServerURL', 'http://kchat:8080/chatbox');
 
 // CHATBOX CUSTOMIZATION PAGE
-var chatboxConfigController = require('./custom_pages/chatboxconfig/chatboxconfig')();
-var chatboxConfigControllerTemplate = require('./custom_pages/chatboxconfig/chatboxconfigtemplate')();
+import chatboxConfigController from './custom_pages/chatboxconfig/chatboxconfig';
+import chatboxConfigControllerTemplate from './custom_pages/chatboxconfig/chatboxconfigtemplate';
 myApp.config(function($stateProvider) {
     $stateProvider.state('chatbox-config', {
         parent: 'main',
@@ -172,33 +173,66 @@ myApp.config(function($stateProvider) {
     });
 });
 
+// CHATBOX CUSTOMIZATION PAGE
+import conversationReplyController from './custom_pages/conversation_reply/replyconfig';
+import conversationReplyTemplate from './custom_pages/conversation_reply/replytemplate';
+myApp.config(function($stateProvider) {
+    $stateProvider.state('chat-conversation-reply', {
+        parent: 'main',
+        url: '/reply_to_chat_conversation/:chatRoomId',
+        controller: conversationReplyController,
+        controllerAs: 'controller',
+        template: conversationReplyTemplate
+    });
+});
+
+   
 /***************************************
- * DEFINE CUSTOM FIELDS
- * ----
+ * CUSTOM FIELDS
+ * ---- 
  * http://ng-admin-book.marmelab.com/doc/Custom-types.html
+ * Use of 'import': // http://stackoverflow.com/questions/36451969/custom-type-the-field-class-is-injected-as-an-object-not-a-function
  ***************************************/
 
-// NOTE: MUST USE 'import' here instead of require(), or the field config will come through as an object, 
-// rather then a function, which will trigger an error message
-// http://stackoverflow.com/questions/36451969/custom-type-the-field-class-is-injected-as-an-object-not-a-function
-//import PagezoneField from './custom_fields/page_zones_field/page_zones_field_config';
+// field for displaying the array of strings field from Stamplay
+import StamplayArrayStrField from './custom_fields/stamplay_array_str_field/stamplay_array_str_field_config';
+import StamplayArrayStrFieldView from './custom_fields/stamplay_array_str_field/stamplay_array_str_view';
+import stamplayArrayOfStringsDirective from './custom_fields/stamplay_array_str_field/stamplay_array_str_directive';
+
+// field that pulls a value from a object saved in an array of strings on Stamplay
+import ObjKeyValueFieldConf      from './custom_fields/obj_key_value/obj_key_value_field_conf';
+import ObjKeyValueFieldView      from './custom_fields/obj_key_value/obj_key_value_field_view';
+import ObjKeyValueFieldDirective from './custom_fields/obj_key_value/obj_key_value_field_directive';
+
+// REGISTER THE CUSTOM FIELDS
 myApp.config(['NgAdminConfigurationProvider', function(nga) {
-    //nga.registerFieldType('pagezone', PagezoneField)
+    nga.registerFieldType('stamplay_array_str', StamplayArrayStrField);
+    nga.registerFieldType('obj_key_value_field', ObjKeyValueFieldConf);
 }]);
-
-//import PagezoneFieldView from './custom_fields/page_zones_field/PagezoneFieldView';
 myApp.config(['FieldViewConfigurationProvider', function(fvp) {
-    //fvp.registerFieldView('pagezone', PagezoneFieldView);
+    fvp.registerFieldView('stamplay_array_str', StamplayArrayStrFieldView);
+    fvp.registerFieldView('obj_key_value_field', ObjKeyValueFieldView);
+}]);
+myApp.directive('stamplayArrStrings', stamplayArrayOfStringsDirective);
+myApp.directive('objKeyValueField', ObjKeyValueFieldDirective);
+
+myApp.directive('replyToChatConversation', ['$location', function ($location) {
+    return {
+        restrict: 'E',
+        scope: { post: '&' },
+        link: function (scope) {
+            scope.send = function () {
+                $location.path('/reply_to_chat_conversation/' + scope.post().values.id);
+            };
+        },
+        template: '<a class="btn btn-default" ng-click="send()">Reply To This Conversation</a>'
+    };
 }]);
 
-//import pagezoneListDirective from './custom_fields/page_zones_field/page_zones_list_directive';
-//myApp.directive('pagezoneList', pagezoneListDirective);
-
-
+ 
 /***************************************
  * DEFINE DATA ENTITIES
  ***************************************/
-
 //import Field from 'admin-config/lib/Field/Field';
 myApp.config(['NgAdminConfigurationProvider', function(nga) {
 
@@ -215,8 +249,7 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
 
     // users (https://bkschool.stamplayapp.com/api/user/v1/)
     var create = require('./models/users');
-    var userEntity = nga.entity('users')
-                        .baseApiUrl('https://kurbi.stamplayapp.com/api/user/v1/');
+    var userEntity = nga.entity('users').baseApiUrl('https://kurbi.stamplayapp.com/api/user/v1/');
     admin.addEntity(create(nga,userEntity));
 
     // customization (of chatbox)
@@ -231,6 +264,10 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
     var create = require('./models/chatroom');
     admin.addEntity(create(nga,nga.entity('chatroom')));
 
+    // chatroom
+    var create = require('./models/articles');
+    admin.addEntity(create(nga,nga.entity('articles')));
+
 
 /***************************************
  * CUSTOM MENU
@@ -244,6 +281,7 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
             .addChild(nga.menu(nga.entity('customization')).title('ChatBox History').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu().title('ChatBox Customize').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))
         )
+        .addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;'))
     );
 
 /***************************************
@@ -262,33 +300,11 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
  ***************************************/
 
     // Experimental Error Handler
-    function appErrorHandler(response) {
+    /*function appErrorHandler(response) {
 console.log('in appErrorHandler');
         return 'Global error: ' + response.status + '(' + response.data + ')';
     }
-    admin.errorMessage(appErrorHandler);
-
-    function errorHandler($rootScope, $state, $translate, notification) {
-        $rootScope.$on("$stateChangeError", function handleError(event, toState, toParams, fromState, fromParams, error) {
-            if (error.status == 404) {
-                $state.go('ma-404');
-                event.preventDefault();
-            } else {
-console.log('in first error handler');
-                $translate('STATE_CHANGE_ERROR', { message: error.message }).then(text => notification.log(text, { addnCls: 'humane-flatty-error' }));
-                throw error;
-            }
-        });
-    }
-
-    myApp.run(errorHandler);
-
-    myApp.config(['$translateProvider', function ($translateProvider) {
-        $translateProvider.translations('en', {
-          'STATE_CHANGE_ERROR': 'Error: {{ message }}'
-        });
-        //$translateProvider.preferredLanguage('en');
-    }]);
+    admin.errorMessage(appErrorHandler);*/
 
 
 /***************************************
@@ -298,3 +314,29 @@ console.log('in first error handler');
     nga.configure(admin);
 
 }]);
+
+
+// ERROR HANDLER
+
+/*function errorHandler($rootScope, $state, $translate, notification) {
+    $rootScope.$on("$stateChangeError", function handleError(event, toState, toParams, fromState, fromParams, error) {
+        if (error.status == 404) {
+            $state.go('ma-404');
+            event.preventDefault();
+        } else {
+console.log('in first error handler');
+            $translate('STATE_CHANGE_ERROR', { message: error.message }).then(text => notification.log(text, { addnCls: 'humane-flatty-error' }));
+            throw error;
+        }
+    });
+}
+*/
+/*myApp.run(errorHandler);
+
+myApp.config(['$translateProvider', function ($translateProvider) {
+    $translateProvider.translations('en', {
+      'STATE_CHANGE_ERROR': 'Error: {{ message }}'
+    });
+    //$translateProvider.preferredLanguage('en');
+}]);
+*/

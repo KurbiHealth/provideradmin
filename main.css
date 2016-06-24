@@ -26,3 +26,8 @@ div.sidebar{
 	border-radius: 5px;
 	padding: 20px;
 }
+
+.chat-message-source-patient{
+	color: red !important;
+	font-size: 18px !important;
+}

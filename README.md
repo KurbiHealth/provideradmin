@@ -24,6 +24,23 @@ The code used for custom fields needs to be processed by browserify and babelify
 
 `watchify main.js -t babelify -o build/bundle.js`
 
+OR
+
+`watchify main.js -o build/bundle.js -t [ babelify --presets [ es2015 ] ]`
+
+OR
+
+`watchify main.js -o build/bundle.js -t [ babelify --presets [ es2015-native-modules ] ]`
+
+?Add to package.json?
+//  ,"browserify": {
+  //    "transform": [
+  //      [
+  //        "babelify"
+  //      ]
+  //    ]
+  //  },
+  //
 
 NOTES:
 ---

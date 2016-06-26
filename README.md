@@ -2,9 +2,16 @@ TO DO
 ---
 * ADD TO CONFIGURATION PAGE:
  * icon - top left
-* icon - avatar
-* welcome message (top left) 
-* color of line under chat box
+ * icon - avatar
+ * welcome message (top left) 
+ * color of line under chat box
+* need to add a user record for chat user at some point
+* add a 2nd chat box for Kurbi's customer support use??
+* add ability to add tags (hashtags) to (qCodes?) in script
+* refactor directories so we can remember where to find code
+* in demo script, choosing back pain and longer then a week, the script hangs, check .js file
+* improve the reply experience in provider app by showing replies in teh chatroom showView. Fix how conversationId is saved in replies (currently shows as array), and fix 'referenced_list' in showView model.
+* get articles tied to a user, and only show articles for currently logged in user
 
 INSTALLATION
 ---

@@ -44,7 +44,7 @@
             }).then(function(res) {
                 // NOTE: the Stamplay SDK saves the jwt token to localStorage using the root url + '-jwt' as the key. EXAMPLE: "http://ngadmin-jwt": [token]
                 // save user values to localStorage
-                window.localStorage.setItem('user', res);
+                window.localStorage.setItem('user', JSON.stringify(res));
                 // redirect to the home page of the admin app
                 window.location.href = "./index.html";
             }), function(err) {

@@ -5,8 +5,14 @@ module.exports = function(nga,articles) {
     .fields([
         nga.field('dt_create','datetime')
             .label('Created'),
-        nga.field('id'),
-        nga.field('author')
+        nga.field('author'),
+        nga.field('title')
+        ,nga.field('published','boolean')
+            .choices([
+              { value: null, label: 'null' },
+              { value: true, label: 'yes' },
+              { value: false, label: 'no' }
+          ])
     ])
     .listActions(['show','edit','delete']);
 
@@ -19,15 +25,28 @@ module.exports = function(nga,articles) {
         ,nga.field('dt_update')
             .label('Last Updated')
         ,nga.field('author')
+        ,nga.field('title')
         ,nga.field('body','wysiwyg')
-        /*,nga.field('conversation_id','reference').targetField('messages')*/
+        ,nga.field('conversation_id')
+        ,nga.field('published','boolean')
+            .choices([
+              { value: null, label: 'null' },
+              { value: true, label: 'yes' },
+              { value: false, label: 'no' }
+          ])
     ])
 
     // CREATION VIEW
     articles.creationView()
     .fields([
-        nga.field('author'),
-        nga.field('body')
+        nga.field('title')
+        ,nga.field('body','wysiwyg')
+        ,nga.field('published','boolean')
+            .choices([
+              { value: null, label: 'null' },
+              { value: true, label: 'yes' },
+              { value: false, label: 'no' }
+          ])
     ])
 
     // EDITION VIEW

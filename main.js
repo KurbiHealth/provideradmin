@@ -264,9 +264,13 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
     var create = require('./models/chatroom');
     admin.addEntity(create(nga,nga.entity('chatroom')));
 
-    // chatroom
+    // articles
     var create = require('./models/articles');
     admin.addEntity(create(nga,nga.entity('articles')));
+
+    // chatroom replies
+    var create = require('./models/chatroomreplies');
+    admin.addEntity(create(nga,nga.entity('chatroomreplies')));
 
 
 /***************************************
@@ -278,6 +282,7 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
         .addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;'))
         .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')
             .addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('customization')).title('ChatBox History').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu().title('ChatBox Customize').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))
         )

@@ -1,4 +1,10 @@
 function processChatroomRecord(data){
+
+	/*  CREATE A USER RECORD FROM THE CHAT ROOM DATA??????
+		OR HAVE A CRON JOB THAT DID IT ALREADY????
+		OR HAVE A STAMPLAY TASK THAT DOES THAT WHEN THE CHATROOM IS SAVED????
+		OR ADD A FUNCTION TO THE CHATBOT TO CREATE A USER RECORD WHEN IT SAVES THE CHATBOT???? */
+
 	var messages = data[0].messages;
 console.log('messages',messages);
 	var question,
@@ -50,41 +56,84 @@ console.log('messages',messages);
 }
 
 function formSubmit(){
+
 	// ask if provider wishes to save a copy as a seed article in Articles
-	var createArticle;
-console.log('data in formSubmit',this.reply,this.question,this.title);
-return false;
-	// save to Chatroomreplies (replyText,chatRoomId)
-	var data = {
+	var Restangular = this.Restangular;
+	var $q = this.$q;
+	var notification = this.notification;
+	var createArticle = false;
+	var promises = [];
+	var that = this;
+	that.returns = [];
+console.log('that',that);
 
-	};
-	Restangular
-		.post(data)
-		.then(function(err,response){
-			if(err){
-				return this.notification.log('There was a problem: ' + JSON.stringify(err));
-			}
-		});
-
-	// if above is true, save to Articles (author,body,title,conversation_id)
-	if(createArticle){
-		Restangular
-			.post(data)
-			.then(function(err,response){
+	if(confirm('Would you like to copy this reply to Articles?')){
+	    var user = window.localStorage.getItem("user");
+	    if(typeof user == 'object' && user == null){
+	        notification.log('problem saving article');
+	        return false;
+	    }else{
+	        user = JSON.stringify(user);
+	    }
+	    var articleData = {
+	    	author: user._id,
+	    	body: this.reply,
+	    	conversation_id: this.chatroomId,
+	    	title: this.question,
+	    	published: false
+		};
+		var articles = Restangular.all('articles');
+		promises.push(
+	    	articles
+			.post(articleData)
+			.then(function(response,err){
 				if(err){
-					return this.notification.log('There was a problem: ' + JSON.stringify(err));
+					that.returns.push('There was a problem: ' + JSON.stringify(err));
 				}
-			});
+				if(response.status == '200'){
+					that.returns.push('Article saved');
+				}
+			})
+		);
 	}
+
+	// save to Chatroomreplies (replyText,chatRoomId)
+	var replyData = {
+		chatRoomId: this.chatroomId
+		,replyText: this.reply
+		//,recipient: THIS NEEDS TO HAVE A USER ID, WHICH MEANS WE NEED TO HAVE A USER RECORD ALREADY CREATED FROM THE CONVERSATION 
+	};
+	var replies = Restangular.all('chatroomreplies');
+	promises.push(
+		replies.post(replyData)
+		.then(function(response,err){
+			if(err){
+				that.returns.push('There was a problem saving the reply: ' + JSON.stringify(err));
+			}
+			if(response.status == '200'){
+				that.returns.push('Reply saved');
+			}
+		})
+	);		
+
+	$q.all(promises).then(function(){
+		notification.log(that.returns.join('\n'));
+		var url = '/#/chatroom/show/' + that.chatroomId;
+console.log('url',url);
+		window.location = url;
+	});
 
 }
 
-function conversationReplyController($stateParams, notification, Restangular) {
+function conversationReplyController($stateParams, notification, Restangular, $q) {
 
 	// set up nofications
 	this.notification = notification;
-	var chatroomId = $stateParams.chatRoomId;
+	this.chatroomId = $stateParams.chatRoomId;
+	var chatroomId = this.chatroomId;
 	this.chatRoomData = null;
+	this.Restangular = Restangular;
+	this.$q = $q;
 
 	// form variables
 	this.question = '';
@@ -104,19 +153,20 @@ function conversationReplyController($stateParams, notification, Restangular) {
 		.getList(chatroomData)
 		.then(function(response,err){
 			if(err){
-				return notification.log('There was a problem: ' + JSON.stringify(err));
+				return this.notification.log('There was a problem: ' + JSON.stringify(err));
 			}
+			
 			this.chatRoomData = response.data.plain();
 
 			// process the record
 			var data = processChatroomRecord(response.data.plain());
-console.log('processed data',data);
+			
 			// display processed data in template form
-console.log('this',this);
 			that.question = data.question;
 			that.tags = data.tags;
 			that.title = data.title;
 			that.avatar = data.avatar;
+			
 			return that;
 		});
 
@@ -127,4 +177,4 @@ console.log('this',this);
 
 export default conversationReplyController;
 
-conversationReplyController.$inject = ['$stateParams', 'notification', 'Restangular'];
+conversationReplyController.$inject = ['$stateParams', 'notification', 'Restangular', '$q'];

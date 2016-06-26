@@ -33,6 +33,17 @@ module.exports = function(nga,chatroom) {
         ,nga.field('custom_action')
             .label('')
             .template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>')
+        ,nga.field('replies','referenced_list')
+            .targetEntity(nga.entity('chatroomreplies'))
+            .targetReferenceField('chatRoomId')
+            .targetFields([
+              nga.field('id'),
+              nga.field('dt_created').label('Posted'),
+              nga.field('replyText').label('Reply')
+            ])
+            .sortField('dt_created')
+            .sortDir('DESC')
+            .listActions(['edit']),
     ])
 
     // CREATION VIEW

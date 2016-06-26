@@ -43,7 +43,7 @@ var ObjKeyValueFieldConf = function (_Field) {
 exports.default = ObjKeyValueFieldConf;
 module.exports = exports["default"];
 
-},{"admin-config/lib/Field/Field":20}],2:[function(require,module,exports){
+},{"admin-config/lib/Field/Field":21}],2:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = ObjKeyValueFieldDirective;
 function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
@@ -250,7 +250,7 @@ exports.default = stamplayArrayOfStrings;
 stamplayArrayOfStrings.$inject = ['NgAdminConfiguration'];
 module.exports = exports['default'];
 
-},{"admin-config/lib/entry":35}],5:[function(require,module,exports){
+},{"admin-config/lib/entry":36}],5:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -310,7 +310,7 @@ var StamplayArrayStrField = function (_EmbeddedListField) {
 exports.default = StamplayArrayStrField;
 module.exports = exports["default"];
 
-},{"admin-config/lib/Field/EmbeddedListField":19}],6:[function(require,module,exports){
+},{"admin-config/lib/Field/EmbeddedListField":20}],6:[function(require,module,exports){
 exports.__esModule = true;
 /*
 getReadWidget:   DISPLAYED IN listView AND showView
@@ -404,7 +404,16 @@ module.exports = exports['default'];
 
 },{}],9:[function(require,module,exports){
 exports.__esModule = true;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 function processChatroomRecord(data) {
+
+	/*  CREATE A USER RECORD FROM THE CHAT ROOM DATA??????
+ 	OR HAVE A CRON JOB THAT DID IT ALREADY????
+ 	OR HAVE A STAMPLAY TASK THAT DOES THAT WHEN THE CHATROOM IS SAVED????
+ 	OR ADD A FUNCTION TO THE CHATBOT TO CREATE A USER RECORD WHEN IT SAVES THE CHATBOT???? */
+
 	var messages = data[0].messages;
 	console.log('messages', messages);
 	var question, avatar, created;
@@ -453,34 +462,76 @@ function processChatroomRecord(data) {
 }
 
 function formSubmit() {
-	// ask if provider wishes to save a copy as a seed article in Articles
-	var createArticle;
-	console.log('data in formSubmit', this.reply, this.question, this.title);
-	return false;
-	// save to Chatroomreplies (replyText,chatRoomId)
-	var data = {};
-	Restangular.post(data).then(function (err, response) {
-		if (err) {
-			return this.notification.log('There was a problem: ' + JSON.stringify(err));
-		}
-	});
 
-	// if above is true, save to Articles (author,body,title,conversation_id)
-	if (createArticle) {
-		Restangular.post(data).then(function (err, response) {
+	// ask if provider wishes to save a copy as a seed article in Articles
+	var Restangular = this.Restangular;
+	var $q = this.$q;
+	var notification = this.notification;
+	var createArticle = false;
+	var promises = [];
+	var that = this;
+	that.returns = [];
+	console.log('that', that);
+
+	if (confirm('Would you like to copy this reply to Articles?')) {
+		var user = window.localStorage.getItem("user");
+		if ((typeof user === 'undefined' ? 'undefined' : _typeof(user)) == 'object' && user == null) {
+			notification.log('problem saving article');
+			return false;
+		} else {
+			user = JSON.stringify(user);
+		}
+		var articleData = {
+			author: user._id,
+			body: this.reply,
+			conversation_id: this.chatroomId,
+			title: this.question,
+			published: false
+		};
+		var articles = Restangular.all('articles');
+		promises.push(articles.post(articleData).then(function (response, err) {
 			if (err) {
-				return this.notification.log('There was a problem: ' + JSON.stringify(err));
+				that.returns.push('There was a problem: ' + JSON.stringify(err));
 			}
-		});
+			if (response.status == '200') {
+				that.returns.push('Article saved');
+			}
+		}));
 	}
+
+	// save to Chatroomreplies (replyText,chatRoomId)
+	var replyData = {
+		chatRoomId: this.chatroomId,
+		replyText: this.reply
+		//,recipient: THIS NEEDS TO HAVE A USER ID, WHICH MEANS WE NEED TO HAVE A USER RECORD ALREADY CREATED FROM THE CONVERSATION
+	};
+	var replies = Restangular.all('chatroomreplies');
+	promises.push(replies.post(replyData).then(function (response, err) {
+		if (err) {
+			that.returns.push('There was a problem saving the reply: ' + JSON.stringify(err));
+		}
+		if (response.status == '200') {
+			that.returns.push('Reply saved');
+		}
+	}));
+
+	$q.all(promises).then(function () {
+		notification.log(that.returns.join('\n'));
+		var url = '/#/chatroom/show/' + that.chatroomId;
+		console.log('url', url);
+		window.location = url;
+	});
 }
 
-function conversationReplyController($stateParams, notification, Restangular) {
+function conversationReplyController($stateParams, notification, Restangular, $q) {
 
 	// set up nofications
 	this.notification = notification;
-	var chatroomId = $stateParams.chatRoomId;
+	this.chatroomId = $stateParams.chatRoomId;
+	var chatroomId = this.chatroomId;
 	this.chatRoomData = null;
+	this.Restangular = Restangular;
+	this.$q = $q;
 
 	// form variables
 	this.question = '';
@@ -497,19 +548,20 @@ function conversationReplyController($stateParams, notification, Restangular) {
 
 	Restangular.all('chatroom').getList(chatroomData).then(function (response, err) {
 		if (err) {
-			return notification.log('There was a problem: ' + JSON.stringify(err));
+			return this.notification.log('There was a problem: ' + JSON.stringify(err));
 		}
+
 		this.chatRoomData = response.data.plain();
 
 		// process the record
 		var data = processChatroomRecord(response.data.plain());
-		console.log('processed data', data);
+
 		// display processed data in template form
-		console.log('this', this);
 		that.question = data.question;
 		that.tags = data.tags;
 		that.title = data.title;
 		that.avatar = data.avatar;
+
 		return that;
 	});
 
@@ -520,7 +572,7 @@ function conversationReplyController($stateParams, notification, Restangular) {
 exports.default = conversationReplyController;
 
 
-conversationReplyController.$inject = ['$stateParams', 'notification', 'Restangular'];
+conversationReplyController.$inject = ['$stateParams', 'notification', 'Restangular', '$q'];
 module.exports = exports['default'];
 
 },{}],10:[function(require,module,exports){
@@ -816,15 +868,19 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     var create = require('./models/chatroom');
     admin.addEntity(create(nga, nga.entity('chatroom')));
 
-    // chatroom
+    // articles
     var create = require('./models/articles');
     admin.addEntity(create(nga, nga.entity('articles')));
+
+    // chatroom replies
+    var create = require('./models/chatroomreplies');
+    admin.addEntity(create(nga, nga.entity('chatroomreplies')));
 
     /***************************************
      * CUSTOM MENU
      ***************************************/
 
-    admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard')).addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;')).addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('customization')).title('ChatBox History').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu().title('ChatBox Customize').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))).addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
+    admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard')).addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;')).addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('customization')).title('ChatBox History').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu().title('ChatBox Customize').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))).addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
 
     /***************************************
      * CUSTOM HEADER
@@ -878,19 +934,17 @@ myApp.config(['$translateProvider', function ($translateProvider) {
 }]);
 */
 
-},{"./custom_fields/obj_key_value/obj_key_value_field_conf":1,"./custom_fields/obj_key_value/obj_key_value_field_directive":2,"./custom_fields/obj_key_value/obj_key_value_field_view":3,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":4,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":5,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":6,"./custom_pages/chatboxconfig/chatboxconfig":7,"./custom_pages/chatboxconfig/chatboxconfigtemplate":8,"./custom_pages/conversation_reply/replyconfig":9,"./custom_pages/conversation_reply/replytemplate":10,"./models/articles":12,"./models/chatbox":13,"./models/chatroom":14,"./models/customization":15,"./models/users":16}],12:[function(require,module,exports){
+},{"./custom_fields/obj_key_value/obj_key_value_field_conf":1,"./custom_fields/obj_key_value/obj_key_value_field_directive":2,"./custom_fields/obj_key_value/obj_key_value_field_view":3,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":4,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":5,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":6,"./custom_pages/chatboxconfig/chatboxconfig":7,"./custom_pages/chatboxconfig/chatboxconfigtemplate":8,"./custom_pages/conversation_reply/replyconfig":9,"./custom_pages/conversation_reply/replytemplate":10,"./models/articles":12,"./models/chatbox":13,"./models/chatroom":14,"./models/chatroomreplies":15,"./models/customization":16,"./models/users":17}],12:[function(require,module,exports){
 module.exports = function (nga, articles) {
 
     // LIST VIEW
-    articles.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('id'), nga.field('author')]).listActions(['show', 'edit', 'delete']);
+    articles.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('author'), nga.field('title'), nga.field('published', 'boolean').choices([{ value: null, label: 'null' }, { value: true, label: 'yes' }, { value: false, label: 'no' }])]).listActions(['show', 'edit', 'delete']);
 
     // SHOW VIEW
-    articles.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('author'), nga.field('body', 'wysiwyg')
-    /*,nga.field('conversation_id','reference').targetField('messages')*/
-    ]);
+    articles.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('author'), nga.field('title'), nga.field('body', 'wysiwyg'), nga.field('conversation_id'), nga.field('published', 'boolean').choices([{ value: null, label: 'null' }, { value: true, label: 'yes' }, { value: false, label: 'no' }])]);
 
     // CREATION VIEW
-    articles.creationView().fields([nga.field('author'), nga.field('body')]);
+    articles.creationView().fields([nga.field('title'), nga.field('body', 'wysiwyg'), nga.field('published', 'boolean').choices([{ value: null, label: 'null' }, { value: true, label: 'yes' }, { value: false, label: 'no' }])]);
 
     // EDITION VIEW
     articles.editionView().fields(articles.creationView().fields());
@@ -930,7 +984,7 @@ module.exports = function (nga, chatroom) {
     // SHOW VIEW
     chatroom.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('key'), nga.field('room'), nga.field('sessionID'), nga.field('messages', 'stamplay_array_str').targetFields([nga.field('source'), nga.field('message.body.text')]).jsonParse(true).fieldValueStyles('[{"fieldName":"source", "value":"patient", "cssClass":"chat-message-source-patient"}]')
     //,nga.field('messages','json')
-    , nga.field('custom_action').label('').template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>')]);
+    , nga.field('custom_action').label('').template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>'), nga.field('replies', 'referenced_list').targetEntity(nga.entity('chatroomreplies')).targetReferenceField('chatRoomId').targetFields([nga.field('id'), nga.field('dt_created').label('Posted'), nga.field('replyText').label('Reply')]).sortField('dt_created').sortDir('DESC').listActions(['edit'])]);
 
     // CREATION VIEW
     chatroom.creationView().fields([nga.field('key')
@@ -945,6 +999,24 @@ module.exports = function (nga, chatroom) {
 };
 
 },{}],15:[function(require,module,exports){
+module.exports = function (nga, chatroomreplies) {
+
+    // LIST VIEW
+    chatroomreplies.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('owner'), nga.field('replyText')]).listActions(['show', 'edit', 'delete']);
+
+    // SHOW VIEW
+    chatroomreplies.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('chatRoomId'), nga.field('recipient'), nga.field('replyText', 'wysiwyg')]);
+
+    // CREATION VIEW
+    chatroomreplies.creationView().fields([nga.field('recipient'), nga.field('replyText', 'wysiwyg')]);
+
+    // EDITION VIEW
+    chatroomreplies.editionView().fields(chatroomreplies.creationView().fields());
+
+    return chatroomreplies;
+};
+
+},{}],16:[function(require,module,exports){
 module.exports = function (nga, customization) {
 
     // LIST VIEW
@@ -967,7 +1039,7 @@ module.exports = function (nga, customization) {
     return customization;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = function (nga, users) {
 
     // LIST VIEW
@@ -985,7 +1057,7 @@ module.exports = function (nga, users) {
     return users;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1264,7 +1336,7 @@ var Entity = function () {
 exports.default = Entity;
 module.exports = exports["default"];
 
-},{"../Field/Field":20,"../Utils/stringUtils":24,"../View/BatchDeleteView":25,"../View/CreateView":26,"../View/DashboardView":27,"../View/DeleteView":28,"../View/EditView":29,"../View/ExportView":30,"../View/ListView":31,"../View/MenuView":32,"../View/ShowView":33}],18:[function(require,module,exports){
+},{"../Field/Field":21,"../Utils/stringUtils":25,"../View/BatchDeleteView":26,"../View/CreateView":27,"../View/DashboardView":28,"../View/DeleteView":29,"../View/EditView":30,"../View/ExportView":31,"../View/ListView":32,"../View/MenuView":33,"../View/ShowView":34}],19:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1377,7 +1449,7 @@ var Entry = function () {
 exports.default = Entry;
 module.exports = exports['default'];
 
-},{"./Utils/objectProperties":22}],19:[function(require,module,exports){
+},{"./Utils/objectProperties":23}],20:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1553,7 +1625,7 @@ var EmbeddedListField = function (_Field) {
 exports.default = EmbeddedListField;
 module.exports = exports["default"];
 
-},{"../Entity/Entity":17,"./Field":20}],20:[function(require,module,exports){
+},{"../Entity/Entity":18,"./Field":21}],21:[function(require,module,exports){
 exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -1853,7 +1925,7 @@ var Field = function () {
 exports.default = Field;
 module.exports = exports["default"];
 
-},{"../Utils/stringUtils":24}],21:[function(require,module,exports){
+},{"../Utils/stringUtils":25}],22:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     getReferencedLists: function getReferencedLists(fields) {
@@ -1898,7 +1970,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -1992,7 +2064,7 @@ function cloneAndNest(object) {
     }, {});
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     order: function order(input) {
@@ -2010,7 +2082,7 @@ exports.default = {
 };
 module.exports = exports["default"];
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     /**
@@ -2032,7 +2104,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -2066,7 +2138,7 @@ var BatchDeleteView = function (_View) {
 exports.default = BatchDeleteView;
 module.exports = exports['default'];
 
-},{"./View":34}],26:[function(require,module,exports){
+},{"./View":35}],27:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2208,7 +2280,7 @@ var CreateView = function (_View) {
 exports.default = CreateView;
 module.exports = exports['default'];
 
-},{"./View":34}],27:[function(require,module,exports){
+},{"./View":35}],28:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2251,7 +2323,7 @@ var DashboardView = function (_ListView) {
 exports.default = DashboardView;
 module.exports = exports['default'];
 
-},{"./ListView":31}],28:[function(require,module,exports){
+},{"./ListView":32}],29:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -2285,7 +2357,7 @@ var DeleteView = function (_View) {
 exports.default = DeleteView;
 module.exports = exports['default'];
 
-},{"./View":34}],29:[function(require,module,exports){
+},{"./View":35}],30:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2426,7 +2498,7 @@ var EditView = function (_View) {
 exports.default = EditView;
 module.exports = exports['default'];
 
-},{"./View":34}],30:[function(require,module,exports){
+},{"./View":35}],31:[function(require,module,exports){
 exports.__esModule = true;
 
 var _ListView2 = require('./ListView');
@@ -2460,7 +2532,7 @@ var ExportView = function (_ListView) {
 exports.default = ExportView;
 module.exports = exports['default'];
 
-},{"./ListView":31}],31:[function(require,module,exports){
+},{"./ListView":32}],32:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2727,7 +2799,7 @@ var ListView = function (_View) {
 exports.default = ListView;
 module.exports = exports['default'];
 
-},{"../Utils/orderElement":23,"./View":34}],32:[function(require,module,exports){
+},{"../Utils/orderElement":24,"./View":35}],33:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2785,7 +2857,7 @@ var MenuView = function (_View) {
 exports.default = MenuView;
 module.exports = exports['default'];
 
-},{"./View":34}],33:[function(require,module,exports){
+},{"./View":35}],34:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -2818,7 +2890,7 @@ var ShowView = function (_View) {
 exports.default = ShowView;
 module.exports = exports['default'];
 
-},{"./View":34}],34:[function(require,module,exports){
+},{"./View":35}],35:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3210,7 +3282,7 @@ var View = function () {
 exports.default = View;
 module.exports = exports['default'];
 
-},{"../Entry":18,"../Utils/ReferenceExtractor":21,"../Utils/objectProperties":22}],35:[function(require,module,exports){
+},{"../Entry":19,"../Utils/ReferenceExtractor":22,"../Utils/objectProperties":23}],36:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3323,4 +3395,4 @@ var Entry = function () {
 exports.default = Entry;
 module.exports = exports['default'];
 
-},{"./Utils/objectProperties":22}]},{},[11]);
+},{"./Utils/objectProperties":23}]},{},[11]);

@@ -1,66 +1,66 @@
-module.exports = function(nga,chatroom) {
+module.exports = function(nga,chatroom,chatReplies) {
+
+    // DELETION VIEW
+    chatroom.deletionView()
+    .disable()
 
     // LIST VIEW
     chatroom.listView()
     .fields([
         nga.field('dt_create','datetime')
-            .label('Created'),
+            .label('Created')
+            .format('MM/dd/yyyy'),
         nga.field('messages','obj_key_value_field')
-            .label('')
+            .label('Question')
             .keyValueChoices('{"qCode":"back pain details"}')
+            .cssClasses(['obj_key_value_field'])
     ])
-    .listActions(['show']);
+    .title('Conversations')
+    .listActions(['show'])
+    .batchActions([]);
 
     // SHOW VIEW
     chatroom.showView()
     .fields([
-        nga.field('owner'),
-        nga.field('dt_create')
-            .label('Created'),
-        nga.field('dt_update')
-            .label('Last Updated'),
-        nga.field('key'),
-        nga.field('room'),
-        nga.field('sessionID'),
-        nga.field('messages','stamplay_array_str')
+        nga.field('owner')
+        ,nga.field('dt_create','datetime')
+            .label('Created')
+            .format('MM/dd/yyyy, HH:mm:ss')
+        ,nga.field('dt_update','datetime')
+            .label('Last Updated')
+            .format('MM/dd/yyyy, HH:mm:ss')
+        // ,nga.field('key')
+        // ,nga.field('room')
+        // ,nga.field('sessionID')
+        ,nga.field('messages','stamplay_array_str')
+            .label('Conversation Details')
             .targetFields([
                 nga.field('source'),
                 nga.field('message.body.text')
             ])
             .jsonParse(true)
             .fieldValueStyles('[{"fieldName":"source", "value":"patient", "cssClass":"chat-message-source-patient"}]')
-        //,nga.field('messages','json')
+            .cssClasses(['short-scroll'])
         ,nga.field('custom_action')
             .label('')
             .template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>')
         ,nga.field('replies','referenced_list')
-            .targetEntity(nga.entity('chatroomreplies'))
-            .targetReferenceField('chatRoomId')
+            .label('Replies')
+            .targetEntity(chatReplies)
+            .targetReferenceField(nga.field('chatRoomId'))
             .targetFields([
-              nga.field('id'),
-              nga.field('dt_created').label('Posted'),
-              nga.field('replyText').label('Reply')
+              nga.field('dt_create','datetime')
+                .label('Posted'),
+              nga.field('replyText','wysiwyg')
+                .label('Detail')
+                .isDetailLink('true')
+                // .map(function truncate(value, entry) {
+                //     return value + '(' + entry.values.subValue + ')';
+                // })
             ])
-            .sortField('dt_created')
-            .sortDir('DESC')
-            .listActions(['edit']),
     ])
-
-    // CREATION VIEW
-    chatroom.creationView()
-    .fields([
-        nga.field('key')
-            //.uploadInformation({ 'url': 'your_url', 'apifilename': 'picture_name' })
-            ,
-        nga.field('messages'),
-        nga.field('room'),
-        nga.field('sessionID'),
-        nga.field('url')
-    ])
-
-    // EDITION VIEW
-    chatroom.editionView()
-    .fields(chatroom.creationView().fields())
+    .title('Conversation Detail')
+    .actions(['list'])
 
     return chatroom;
 

@@ -6,6 +6,10 @@ TO DO
  * welcome message (top left) 
  * color of line under chat box
 * need to add a user record for chat user at some point
+ * CREATE A USER RECORD FROM THE CHAT ROOM DATA??????
+ * OR HAVE A CRON JOB THAT DID IT ALREADY????
+ * OR HAVE A STAMPLAY TASK THAT DOES THAT WHEN THE CHATROOM IS SAVED????
+ * OR ADD A FUNCTION TO THE CHATBOT TO CREATE A USER RECORD WHEN IT SAVES THE CHATBOT????
 * add a 2nd chat box for Kurbi's customer support use??
 * add ability to add tags (hashtags) to (qCodes?) in script
 * refactor directories so we can remember where to find code
@@ -64,5 +68,7 @@ To use custom fields, the admin-config must be explicitly added to the node modu
  }`
 
 **Bug**
-There is a bug in the "admin-config" app from marmelabs that affects relationships in "show" view. In the file `/admin-config/lib/Utils/ReferenceExtractor.js`, in the function `indexByName(references)`, the line `referencesByName[reference.name()] = reference;` did not have `.name()` and that created an issue that wasn't caught by any error trapping. In the /build/ng-admin.min.js` file, search for 'indexByName' and make sure that the 3rd occurrence looks like `!0)},indexByName:function(e){return e.reduce(function(e,t){return e[t.name()]`.
+There is a bug in the "admin-config" app from marmelabs that affects relationships in "show" view. In the file `/admin-config/lib/Utils/ReferenceExtractor.js`, in the function `indexByName(references)`, the line `referencesByName[reference.name()] = reference;` did not have `.name()` and that created an issue that wasn't caught by any error trapping. 
+
+In the /build/ng-admin.min.js` file, search for 'indexByName' and make sure that the 3rd occurrence looks like `!0)},indexByName:function(e){return e.reduce(function(e,t){return e[t.name()]`.
 * Issue on Github: https://github.com/marmelab/ng-admin/issues/553

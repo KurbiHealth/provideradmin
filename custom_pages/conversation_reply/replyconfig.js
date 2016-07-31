@@ -6,7 +6,7 @@ function processChatroomRecord(data){
 		OR ADD A FUNCTION TO THE CHATBOT TO CREATE A USER RECORD WHEN IT SAVES THE CHATBOT???? */
 
 	var messages = data[0].messages;
-console.log('messages',messages);
+
 	var question,
 		avatar,
 		created;
@@ -65,7 +65,6 @@ function formSubmit(){
 	var promises = [];
 	var that = this;
 	that.returns = [];
-console.log('that',that);
 
 	if(confirm('Would you like to copy this reply to Articles?')){
 	    var user = window.localStorage.getItem("user");
@@ -112,6 +111,12 @@ console.log('that',that);
 			}
 			if(response.status == '200'){
 				that.returns.push('Reply saved');
+				// add a line to the replies arr in chatroom
+				that.replies.push(response.data.id);
+				Restangular.all('chatroom')
+					.doPUT({id: that.chatroomId,replies:that.replies})
+					.then(function(response){
+					});
 			}
 		})
 	);		
@@ -119,7 +124,6 @@ console.log('that',that);
 	$q.all(promises).then(function(){
 		notification.log(that.returns.join('\n'));
 		var url = '/#/chatroom/show/' + that.chatroomId;
-console.log('url',url);
 		window.location = url;
 	});
 
@@ -141,6 +145,7 @@ function conversationReplyController($stateParams, notification, Restangular, $q
 	this.title = '';
 	this.reply = '';
 	this.avatar = '';
+	this.replies = [];
 	var that = this;
 
 	// load ChatRoom record from Stamplay
@@ -166,7 +171,10 @@ function conversationReplyController($stateParams, notification, Restangular, $q
 			that.tags = data.tags;
 			that.title = data.title;
 			that.avatar = data.avatar;
-			
+			if(data.replies)
+				that.replies = data.replies;
+			else
+				that.replies = [];
 			return that;
 		});
 

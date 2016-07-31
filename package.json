@@ -5,6 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "angular-sanitize": "^1.5.6",
+    "angularjs-color-picker": "^2.3.0",
     "bootstrap-material-design": "latest",
     "browserify": "13.0.0",
     "ng-admin": "latest",

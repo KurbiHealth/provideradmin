@@ -22,7 +22,7 @@ export default function ObjKeyValueFieldDirective(FieldViewConfiguration, $compi
             if(messages){
 
                 messages.map(function(currMessage){
-                    
+// TO DO: to make this more universally useful, take out hard coded references to 'patient' and 'qCode'
                     currMessage = JSON.parse(currMessage);
                     if(currMessage.source == 'patient'){
                         if(currMessage.message.qCode){

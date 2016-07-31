@@ -8,61 +8,40 @@ var myApp = angular.module('myApp',
         'ngSanitize',
         "com.2fdevs.videogular",
             "com.2fdevs.videogular.plugins.controls",
-            "info.vietnamcode.nampnq.videogular.plugins.youtube"
+            "info.vietnamcode.nampnq.videogular.plugins.youtube",
+        "color.picker"
     ]
 );
 
+
 /***************************************
- * PRE-RESTANGULAR INTERCEPTOR FUNCTIONS
+ * RESTANGULAR ERROR HANDLER (API CALLS)
  ***************************************/
 
-myApp.config(function ($httpProvider) {
-    
-    // USING 'unshift' TO RUN THESE FUNCTIONS FIRST!!!!
-    $httpProvider.interceptors.unshift(addContentTypeToHeader);
+/*myApp.config(function(RestangularProvider) {
 
-    // Angular removes the header 'Content-Type' if request is GET.
-    // This function is a hack to add the header back in, because some API's require the header.
-    function addContentTypeToHeader() {
-        return {
-            request : requestInterceptor
-        };
+    var refreshAccesstoken = function() {
+        var deferred = $q.defer();
 
-        function requestInterceptor(config) {
-            if (angular.isDefined(config.headers['Content-Type']) && !angular.isDefined(config.data))
-                config.data = '';
+        // Refresh access-token logic
 
-            return config;
+        return deferred.promise;
+    };
+
+    Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
+        if(response.status === 403) {
+            refreshAccesstoken().then(function() {
+                // Repeat the request and then call the handlers the usual way.
+                $http(response.config).then(responseHandler, deferred.reject);
+                // Be aware that no request interceptors are called this way.
+            });
+
+            return false; // error handled
         }
-    }
 
-    // these functions run in regular order (prior to Restangular interceptors)
-    $httpProvider.interceptors.push(removeStamplayFields);
-
-    // When NG-Admin does a list GET, it receives all fields for that data model, and those fields
-    // persist in the dataStore, even if the editionView only defines a couple of fields. Which means
-    // that the un-editable fields in Stamplay must be removed before doing a PUT
-    function removeStamplayFields($q) {
-        return {
-            request : function(config) {
-                config = angular.copy(config);
-
-                if(config.method === 'PUT'){
-                    delete config.data.__v;
-                    delete config.data._id;
-                    delete config.data.appId;
-                    delete config.data.cobjectId;
-                    delete config.data.dt_create;
-                    delete config.data.dt_update;
-                    delete config.data.id;
-                    delete config.data.actions;
-                }
-
-                return config || $q.when(config);
-            }
-        };
-    }
-});
+        return true; // error not handled
+    });
+});*/
 
 
 /***************************************
@@ -86,7 +65,7 @@ myApp.config(function(RestangularProvider) {
   
     RestangularProvider.addFullRequestInterceptor(function(element, operation, what, url, 
         headers, params, httpConfig) {
-        //console.log('url',url); 
+        //console.log('url',angular.copy(url));
         // STAMPLAY CANONICAL URL IS:
         // https://bkschool.stamplayapp.com/api/cobject/v1/audio
         // ?n=10&sort=audio_url&page=1&per_page=10
@@ -99,12 +78,14 @@ myApp.config(function(RestangularProvider) {
 
         // FIX PAGINATION
         // STAMPLAY'S FORMAT == n=21&page=2&per_page=10
-console.log('request operation,',operation);
-console.log('request what,',what);
+
+        console.log('request operation,',operation);
+        //console.log('request what,',what);
+
         if (operation == 'getList') {
             params.page = params._page;
             params.per_page = params._perPage;
-            if(params._sortField != ''){
+            if(params._sortField){
                 params.sort = '';
                 if(params._sortDir == 'DESC') params.sort = '-';
                  params.sort += params._sortField;
@@ -114,7 +95,7 @@ console.log('request what,',what);
             delete params._sortField;
             delete params._sortDir;
         }
-console.log('params',params);
+        
         return { element: element, params: params };
     });
 
@@ -140,7 +121,7 @@ console.log('params',params);
         // FIX PAGINATION
         if (operation == "getList") {
             var contentRange = data.pagination.total_elements;
-console.log('num of entries retrieved by Restangular',contentRange);
+            //console.log('num of entries retrieved by Restangular',contentRange);
             response.totalCount = contentRange;
         }
         
@@ -150,15 +131,78 @@ console.log('num of entries retrieved by Restangular',contentRange);
 
 });
 
-  
+
+/***************************************
+ * POST-RESTANGULAR INTERCEPTOR FUNCTIONS
+ ***************************************/
+
+myApp.config(function ($httpProvider) {
+    
+    // USING 'unshift' TO RUN THESE FUNCTIONS FIRST!!!!
+    $httpProvider.interceptors.unshift(addContentTypeToHeader);
+
+    // Angular removes the header 'Content-Type' if request is GET.
+    // This function is a hack to add the header back in, because some API's require the header.
+    function addContentTypeToHeader() {
+        return {
+            request : requestInterceptor
+        };
+
+        function requestInterceptor(config) {
+            if (angular.isDefined(config.headers['Content-Type']) && !angular.isDefined(config.data))
+                config.data = '';
+
+            return config;
+        }
+    }
+
+    // these functions run in regular order (after Restangular interceptors)
+    $httpProvider.interceptors.push(fixStamplayIssues);
+
+    // When NG-Admin does a list GET, it receives all fields for that data model, and those fields
+    // persist in the dataStore, even if the editionView only defines a couple of fields. Which means
+    // that the un-editable fields in Stamplay must be removed before doing a PUT
+    function fixStamplayIssues($q) {
+        return {
+            request : function(config) {
+                config = angular.copy(config);
+                if(config.method === 'PUT'){
+                    delete config.data.__v;
+                    delete config.data._id;
+                    delete config.data.appId;
+                    delete config.data.cobjectId;
+                    delete config.data.dt_create;
+                    delete config.data.dt_update;
+                    delete config.data.id;
+                    delete config.data.actions;
+                }
+
+                if(config.method == 'GET' && config.params){
+                    if(config.params._filters && '[object Object]' in config.params._filters){
+                        var temp = config.params._filters['[object Object]'];
+                        delete config.params._filters;
+                        config.params.chatRoomId = temp;
+                    }
+                    //config.url += '/' + config.params.id;
+                    //delete config.params.id;
+                }
+
+                return config || $q.when(config);
+            }
+        };
+    }
+
+});
+
+
 /***************************************
  * CUSTOM PAGES
  * ----
  * http://ng-admin-book.marmelab.com/doc/Custom-pages.html
  ***************************************/
 
-myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
-//myApp.constant('chatServerURL', 'http://kchat:8080/chatbox');
+//myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
+myApp.constant('chatServerURL', 'http://kchat:8080/chatbox');
 
 // CHATBOX CUSTOMIZATION PAGE
 import chatboxConfigController from './custom_pages/chatboxconfig/chatboxconfig';
@@ -166,14 +210,17 @@ import chatboxConfigControllerTemplate from './custom_pages/chatboxconfig/chatbo
 myApp.config(function($stateProvider) {
     $stateProvider.state('chatbox-config', {
         parent: 'main',
-        url: '/chatbox_config',
+        url: '/chatbox_config/:chatBoxId?',
+        params: {
+            chatBoxId: {squash: true, value: null}
+        },
         controller: chatboxConfigController,
         controllerAs: 'controller',
         template: chatboxConfigControllerTemplate
     });
 });
 
-// CHATBOX CUSTOMIZATION PAGE
+// REPLY TO USER QUESTION PAGE
 import conversationReplyController from './custom_pages/conversation_reply/replyconfig';
 import conversationReplyTemplate from './custom_pages/conversation_reply/replytemplate';
 myApp.config(function($stateProvider) {
@@ -221,13 +268,37 @@ myApp.directive('replyToChatConversation', ['$location', function ($location) {
         restrict: 'E',
         scope: { post: '&' },
         link: function (scope) {
-            scope.send = function () {
+            scope.redirect = function () {
                 $location.path('/reply_to_chat_conversation/' + scope.post().values.id);
             };
         },
-        template: '<a class="btn btn-default" ng-click="send()">Reply To This Conversation</a>'
+        template: '<a class="btn btn-default reply-to-conversation-btn" ng-click="redirect()">Reply To This Conversation</a>'
     };
 }]);
+
+myApp.directive('editChatBox', ['$location', function($location){
+    return {
+        restrict: 'E',
+        link: function(scope,ele,attrs){
+console.log('scope',scope);
+console.log('attrs',attrs);
+            scope.editChatBoxUrl = scope.entry ? scope.entry._identifierValue : '';
+            scope.size = attrs.size;
+            scope.type = attrs.type ? attrs.type : '';
+        },
+        template: `<a class="btn btn-default" style="margin-left:4px;" 
+                    ng-class="size ? 'btn-' + size : ''"  
+                    href="#/chatbox_config/{{editChatBoxUrl}}">
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"
+                            ng-if="type=='edit'"></span>
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"
+                            ng-if="type=='create'"></span>
+                        &nbsp;
+                        <span ng-if="type=='edit'" class="hidden-xs ng-scope" translate="EDIT">Edit</span>
+                        <span ng-if="type=='create'" class="hidden-xs ng-scope" translate="CREATE">Create</span>
+                    </a>`
+    }
+}])
 
  
 /***************************************
@@ -260,17 +331,18 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
     var create = require('./models/chatbox');
     admin.addEntity(create(nga,nga.entity('chatbox')));
 
-    // chatroom
-    var create = require('./models/chatroom');
-    admin.addEntity(create(nga,nga.entity('chatroom')));
-
     // articles
     var create = require('./models/articles');
     admin.addEntity(create(nga,nga.entity('articles')));
 
     // chatroom replies
     var create = require('./models/chatroomreplies');
-    admin.addEntity(create(nga,nga.entity('chatroomreplies')));
+    var chatReplies = nga.entity('chatroomreplies');
+    admin.addEntity(create(nga,chatReplies,nga.entity('chatroom')));
+
+    // chatroom
+    var create = require('./models/chatroom');
+    admin.addEntity(create(nga,nga.entity('chatroom'),chatReplies));
 
 
 /***************************************
@@ -283,7 +355,7 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
         .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')
             .addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
-            .addChild(nga.menu(nga.entity('customization')).title('ChatBox History').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu().title('ChatBox Customize').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))
         )
         .addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;'))

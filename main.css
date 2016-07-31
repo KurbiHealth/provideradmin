@@ -12,6 +12,32 @@ div.sidebar{
 
 }
 
+.short-scroll{
+	max-height: 200px;
+	overflow: auto;
+	border-bottom: 5px solid gray;
+	border-top: 5px solid gray;
+	padding: 10px;
+	margin: 20px 0;
+}
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+.obj_key_value_field label{
+	display:none;
+}
+
+.reply-to-conversation-btn{
+	margin:10px 0;
+}
+
 /* LOGIN PAGE */
 
 #login-page{

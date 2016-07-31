@@ -9,7 +9,8 @@ module.exports = function(nga,customization) {
         nga.field('chat_avatar'),
         nga.field('chat_url')
     ])
-    .listActions(['show','edit','delete']);
+    .listActions(['show','edit','delete'])
+    .title('Chatboxes');
 
     // SHOW VIEW
     customization.showView()

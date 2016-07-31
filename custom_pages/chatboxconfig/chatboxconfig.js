@@ -45,17 +45,15 @@ console.log('new chatBox');
 
 		var apiKey = 'public';
 
-		var data = {
+		var customizationFormData = {
 			avatar: this.avatar,
 			color: this.color,
-			headline: this.headline,
-			snippet: this.snippet,
-			url: this.url
+			headline: this.headline
 		};
   
 		if(currView == 'new'){
 			$http
-			.post(URL,data)
+			.post(URL,customizationFormData)
 			.then(function(response) {
 				// Add snippet to UI
 				console.log(response);
@@ -71,35 +69,45 @@ console.log('new chatBox');
 				var snippet = response.snippet;
 
 				// Save form elements and snippet to Stamplay
-				var custom = Restangular.one('customization');
-				
-				custom.chat_avatar = data.avatar;
-				custom.chat_color = data.color;
-				custom.chat_headline = data.headline;
-				
-				custom.save()
-				.then(function(response) {
-					console.log(response);
+				var data = {
+					'chat_avatar': customizationFormData.avatar,
+					'chat_color': customizationFormData.color,
+					'chat_headline': customizationFormData.headline,
+					'chatbox': chatBoxId
+				};
+				Restangular.all('customization')
+					.post(data)
+					.then(function(response) {
+console.log('customization response',response);
 					// save the snippet & link to Customization rcd 
 					// to the ChatBox record
-		console.log('chatBoxId',chatBoxId);
-		console.log('snippet',snippet);
+console.log('chatBoxId',chatBoxId,'snippet',snippet);
 					var customizationId = response.data.id;
-		console.log('customizationId',customizationId);
+console.log('customizationId',customizationId);
 
-					var chatBoxGet = {
-						"_id": chatBoxId
-					};
 					var chatBoxData = {
-						snippet: snippet,
-						customizations: [chatBoxId]
+						'snippet': snippet,
+						'customizations': ''
 					}
-					var chatBox = Restangular
-						.all('chatbox')
-						.getList(chatBoxGet)
-						.push(chatBoxData)
+					Restangular
+						.one('chatbox',chatBoxId)
+						.get()
 						.then(function(result){
-console.log('result of updating chatbox',result);
+							var temp = result.data.plain();
+console.log('result from chatbox get',temp);
+							if(!temp.customizations){
+								customArr = [];
+							}else{
+								var customArr = temp.customizations;
+							}
+							customArr.push(customizationId);
+							chatBoxData.customizations = customArr;
+console.log('chatbox data',chatBoxData);
+							Restangular.one('chatbox',chatBoxId)
+								.customPUT(chatBoxData)
+								.then(function(result){
+console.log('updated chatbox with snippet and new customizations array',result.data.plain());
+								})
 						});
 				}, function(err) {
 					console.log("There was an error saving.",err);
@@ -132,7 +140,7 @@ console.log('result of updating chatbox',result);
 
 					});
 				})
-			});
+			}); */
 
 		} // END if(currView == 'edit')
 

@@ -325,11 +325,12 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
 
     // customization (of chatbox)
     var create = require('./models/customization');
-    admin.addEntity(create(nga,nga.entity('customization')));
+    var customizations = nga.entity('customization');
+    admin.addEntity(create(nga,customizations));
 
     // chatbox
     var create = require('./models/chatbox');
-    admin.addEntity(create(nga,nga.entity('chatbox')));
+    admin.addEntity(create(nga,nga.entity('chatbox'),customizations));
 
     // articles
     var create = require('./models/articles');

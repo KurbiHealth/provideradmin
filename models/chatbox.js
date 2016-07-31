@@ -1,4 +1,4 @@
-module.exports = function(nga,chatbox) {
+module.exports = function(nga,chatbox,customizations) {
 
     // LIST VIEW
     var listViewActionsTemplate = '<ma-export-to-csv-button entity="::entity" datastore="::datastore"></ma-export-to-csv-button>' +
@@ -30,6 +30,10 @@ module.exports = function(nga,chatbox) {
             .label('Last Updated'),
         nga.field('snippet')
             .label('Web Snippet')
+        ,nga.field('customizations','reference_many')
+            .label('History of changes')
+            .targetEntity(customizations)
+            .targetField(nga.field('chat_color'))
         ,nga.field('')
             .label('Conversations') // referenced_list of ChatRoom(s)
     ])

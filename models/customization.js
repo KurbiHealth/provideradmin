@@ -6,8 +6,8 @@ module.exports = function(nga,customization) {
         nga.field('id'),
         nga.field('dt_create')
             .label('Created'),
-        nga.field('chat_avatar'),
-        nga.field('chat_url')
+//        nga.field('chat_avatar'),
+//        nga.field('chat_url')
     ])
     .listActions(['show','edit','delete'])
     .title('Chatboxes');

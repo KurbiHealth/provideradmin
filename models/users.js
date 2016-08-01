@@ -4,7 +4,8 @@ module.exports = function(nga,users) {
     users.listView()
     .fields([
         nga.field('id'),
-        nga.field('displayName'),
+        nga.field('displayName')
+        	.label('Username'),
         nga.field('email')
     ])
     .listActions(['show','edit','delete']);
@@ -17,7 +18,8 @@ module.exports = function(nga,users) {
         nga.field('dt_update'),
         nga.field('firstName'),
         nga.field('lastName'),
-        nga.field('displayName'),
+        nga.field('displayName')
+        	.label('Username'),
         nga.field('email'),
         nga.field('givenRole'),
         nga.field('pictures','embedded_list')
@@ -37,7 +39,8 @@ module.exports = function(nga,users) {
     .fields([
         nga.field('firstName'),
         nga.field('lastName'),
-        nga.field('displayName'),
+        nga.field('displayName')
+        	.label('Username'),
         nga.field('email')
     ]);
 

@@ -78,22 +78,25 @@
             // get current user's ID
             var userId = user._id;
             console.log('Logged Users ID:', userId);
-            
-            window.location.href = "./index.html";
 						
-						// get current user's role
+						window.location.href = "./index.html";
+						
+//						 get current user's role
 //            var userRole = user.givenRole;
 //            console.log('User Role??', userRole);
-            
-            // if user is ADMIN redirect to the home page of the admin app, otherwise stay on login page and alert
-//            if (userRole == '56fd7f1cd78d197404c79322') {
+//            
+//             if user is ADMIN redirect to the home page of the admin app, otherwise stay on login page and alert
+//            if (userRole == '5724cbcd7db40d2b433ad9ef') {
+//            	window.location.href = "./index.html";
+//            } else if (userRole == '5724cbeb7db40d2b433ad9f0') {
 //            	window.location.href = "./index.html";
 //            } else {
 //            	window.localStorage.removeItem('user');
-//            	window.localStorage.removeItem('http://ngadmin-jwt');
+//            	window.localStorage.removeItem('username');
+//            	window.localStorage.removeItem('http://kpadmin-jwt');
 //            	bootbox.alert({
-//            		title: "Byron Katie Admin",
-//            		message: "You must be an Administrator to access this content."
+//            		title: "Kurbi Provider Admin",
+//            		message: "You must be an Administrator/Provider to access this content."
 //							});
 //            }
             

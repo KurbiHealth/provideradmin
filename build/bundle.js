@@ -429,6 +429,7 @@ function chatboxConfigController($stateParams, notification, Restangular, $http,
 						} else {
 							var customArr = temp.customizations;
 						}
+						// TO DO save chatbox.id in customization.chatbox
 						customArr.push(customizationId);
 						chatBoxData.customizations = customArr;
 						console.log('chatbox data', chatBoxData);

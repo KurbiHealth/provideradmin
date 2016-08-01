@@ -100,6 +100,7 @@ console.log('result from chatbox get',temp);
 							}else{
 								var customArr = temp.customizations;
 							}
+// TO DO save chatbox.id in customization.chatbox
 							customArr.push(customizationId);
 							chatBoxData.customizations = customArr;
 console.log('chatbox data',chatBoxData);

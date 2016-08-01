@@ -13,6 +13,11 @@ var myApp = angular.module('myApp',
     ]
 );
 
+// custom controllers
+myApp.controller('username', ['$scope', '$window', function($scope, $window) { // used in header.html
+    $scope.username =  $window.localStorage.getItem('username');
+}])
+
 
 /***************************************
  * RESTANGULAR ERROR HANDLER (API CALLS)
@@ -365,7 +370,26 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
 /***************************************
  * CUSTOM HEADER
  ***************************************/
-
+	var customHeaderTemplate =
+	'<div class="navbar-header">' +
+	    '<button type="button" class="navbar-toggle" ng-click="isCollapsed = !isCollapsed">' +
+	      '<span class="icon-bar"></span>' +
+	      '<span class="icon-bar"></span>' +
+	      '<span class="icon-bar"></span>' +
+	    '</button>' +
+	    '<a class="navbar-brand" href="#" ng-click="appController.displayHome()"><img src="images/logo.png" align="left" style="margin:-8px 5px 0 0;" />Kurbi Provider Admin</a>' +
+	'</div>' +
+	'<ul class="nav navbar-top-links navbar-right hidden-xs">' +
+		'<li uib-dropdown>' +
+			'<a uib-dropdown-toggle href="#" aria-expanded="true" ng-controller="username" style="color: #ffffff;" class="username">' +
+				'<i class="glyphicon glyphicon-user"></i>&nbsp;{{username}}&nbsp;<i class="fa fa-caret-down"></i>' +
+			'</a>' +
+			'<ul class="dropdown-menu dropdown-user" role="menu">' +
+				'<li><a href="#" onclick="logout()"><i class="glyphicon glyphicon-log-out"></i> Logout</a></li>' +
+			'</ul>' +
+		'</li>' +
+	'</ul>';
+	admin.header(customHeaderTemplate);
 
 /***************************************
  * CUSTOM DASHBOARD

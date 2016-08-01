@@ -1,18 +1,24 @@
-#header-nav{
-	background-color: #410E7E;
-}
-#header-nav a.navbar-brand{
-	color: white;
-}
+/* MAIN STYLES */
+body { background-color: #f2f2f2; }
+/*#page-wrapper { background: #ffffff; border-left: 1px solid #0B0014; }*/
+a, a:visited { color: #596672; }
 
-div.sidebar{
+.tag-item a.multiple.ng-scope:hover { text-decoration: none; }
+.capitalize { text-transform: capitalize; }
 
-}
-.nav>li>a{
+/* HEADER STYLES */
+	#header-nav{ background-color: #46008C; }
+#header-nav a.navbar-brand{ color: #ffffff; }
+#header-nav .nav>li>a.username { padding: 15px; }
+#header-nav .nav>li>a.username:hover,
+#header-nav .nav>li>a.username:focus,
+#header-nav .nav>li>a.username:active { background-color: #240038 !important; }
 
-}
+/* PAGE STYLES */
+.page-header h1 { color: #0059B2; }
 
-.short-scroll{
+/* CUSTOM STYLES */
+.short-scroll {
 	max-height: 200px;
 	overflow: auto;
 	border-bottom: 5px solid gray;
@@ -21,39 +27,70 @@ div.sidebar{
 	margin: 20px 0;
 }
 ::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 7px;
+	-webkit-appearance: none;
+	width: 7px;
 }
 ::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: rgba(0,0,0,.5);
-    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+  border-radius: 4px;
+  background-color: rgba(0,0,0,.5);
+  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
+.obj_key_value_field label { display:none; }
+.reply-to-conversation-btn { margin:10px 0; }
+.chat-message-source-patient { color: red !important; font-size: 18px !important; }
 
-.obj_key_value_field label{
-	display:none;
-}
 
-.reply-to-conversation-btn{
-	margin:10px 0;
-}
+/*----------------------------------------------------------------------
+ LOGIN PAGE 
+ ---------------------------------------------------------------------*/
 
-/* LOGIN PAGE */
+/* MAIN STYLES */
+body#login-page { background-color: #f2f2f2; }
 
-#login-page{
-	background-color: blue;
-}
-#login-page .main{
-	width: 50%;
-	background-color: white;
-	display: block;
+body#login-page .main {
 	margin: 100px auto;
-	border: 1px solid black;
+	padding: 30px 40px;
+	width: 50%;
+	background-color: #ffffff;
+	border: 1px solid #f2f2f2;
 	border-radius: 5px;
-	padding: 20px;
 }
 
-.chat-message-source-patient{
-	color: red !important;
-	font-size: 18px !important;
+body#login-page .form-header {
+	text-align: center;
+}
+
+body#login-page .main h1 { font-size: 28px; color: #46008C; }
+
+.copy-right { margin-top: 60px; color: #596672; text-align: center; }
+
+.panel-heading { padding: 10px; font-weight: bold; }
+
+.table-striped>tbody>tr:nth-of-type(odd) { background-color: #f2f2f2; }
+
+/* FORM STYLES */
+form#admin-login { margin: 40px auto 0 auto; max-width: 500px; }
+form#admin-login { color: #596672; }
+form#admin-login input[type="email"],
+form#admin-login input[type="password"] { height: 40px; }
+form#admin-login button.btn.btn-default { margin-top: 8px; width: 100%; height: 50px; font-size: 18px; color: #ffffff; font-weight: bold; background-color: #0059B2; border-color: #0059B2; }
+form#admin-login button.btn.btn-default:hover { background-color: #327ac1; }
+
+.btn-link { color: #0059B2; }
+.btn.btn-default:hover { color: #ffffff; background-color: #327ac1; }
+.btn.btn-primary { color: #ffffff; background-color: #0059B2; border-color: #8699ab; }
+.btn.btn-primary:hover { background-color: #327ac1; }
+
+
+/* RESPONSIVE STYLES */
+@media screen and (max-width: 900px) {
+	
+	body#login-page .main { padding: 30px 40px; width: 75%; }
+
+}
+
+@media screen and (max-width: 767px) {
+	
+	body#login-page .main { padding: 20px 25px; width: 85%; }
+
 }

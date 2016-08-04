@@ -1188,7 +1188,10 @@ module.exports = function (nga, chatroomreplies, chatRoom) {
 module.exports = function (nga, customization) {
 
     // LIST VIEW
-    customization.listView().fields([nga.field('id'), nga.field('dt_create').label('Created'), nga.field('chat_avatar'), nga.field('chat_url')]).listActions(['show', 'edit', 'delete']).title('Chatboxes');
+    customization.listView().fields([nga.field('id'), nga.field('dt_create').label('Created')]).
+    //        nga.field('chat_avatar'),
+    //        nga.field('chat_url')
+    listActions(['show', 'edit', 'delete']).title('Chatboxes');
 
     // SHOW VIEW
     customization.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('chat_avatar'), nga.field('chat_color'), nga.field('chat_headline'), nga.field('chat_snippet'), nga.field('chat_url')
@@ -1211,13 +1214,13 @@ module.exports = function (nga, customization) {
 module.exports = function (nga, users) {
 
     // LIST VIEW
-    users.listView().fields([nga.field('id'), nga.field('displayName'), nga.field('email')]).listActions(['show', 'edit', 'delete']);
+    users.listView().fields([nga.field('id'), nga.field('displayName').label('Username'), nga.field('email')]).listActions(['show', 'edit', 'delete']);
 
     // SHOW VIEW
-    users.showView().fields([nga.field('id'), nga.field('dt_create'), nga.field('dt_update'), nga.field('firstName'), nga.field('lastName'), nga.field('displayName'), nga.field('email'), nga.field('givenRole'), nga.field('pictures', 'embedded_list').targetFields([nga.field('google'), nga.field('facebook')]), nga.field('identities', 'embedded_list').targetFields([nga.field('google'), nga.field('facebook')])]);
+    users.showView().fields([nga.field('id'), nga.field('dt_create'), nga.field('dt_update'), nga.field('firstName'), nga.field('lastName'), nga.field('displayName').label('Username'), nga.field('email'), nga.field('givenRole'), nga.field('pictures', 'embedded_list').targetFields([nga.field('google'), nga.field('facebook')]), nga.field('identities', 'embedded_list').targetFields([nga.field('google'), nga.field('facebook')])]);
 
     // CREATION VIEW
-    users.creationView().fields([nga.field('firstName'), nga.field('lastName'), nga.field('displayName'), nga.field('email')]);
+    users.creationView().fields([nga.field('firstName'), nga.field('lastName'), nga.field('displayName').label('Username'), nga.field('email')]);
 
     // EDITION VIEW
     users.editionView().fields(users.creationView().fields());

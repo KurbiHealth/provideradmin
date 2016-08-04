@@ -1,13 +1,13 @@
 /* MAIN STYLES */
 body { background-color: #f2f2f2; }
 /*#page-wrapper { background: #ffffff; border-left: 1px solid #0B0014; }*/
-a, a:visited { color: #596672; }
+a, a:visited { color: #666666; }
 
 .tag-item a.multiple.ng-scope:hover { text-decoration: none; }
 .capitalize { text-transform: capitalize; }
 
 /* HEADER STYLES */
-	#header-nav{ background-color: #46008C; }
+#header-nav{ background-color: #46008C; }
 #header-nav a.navbar-brand{ color: #ffffff; }
 #header-nav .nav>li>a.username { padding: 15px; }
 #header-nav .nav>li>a.username:hover,
@@ -63,7 +63,7 @@ body#login-page .form-header {
 
 body#login-page .main h1 { font-size: 28px; color: #46008C; }
 
-.copy-right { margin-top: 60px; color: #596672; text-align: center; }
+.copy-right { margin-top: 60px; color: #666666; text-align: center; }
 
 .panel-heading { padding: 10px; font-weight: bold; }
 
@@ -71,7 +71,7 @@ body#login-page .main h1 { font-size: 28px; color: #46008C; }
 
 /* FORM STYLES */
 form#admin-login { margin: 40px auto 0 auto; max-width: 500px; }
-form#admin-login { color: #596672; }
+form#admin-login { color: #666666; }
 form#admin-login input[type="email"],
 form#admin-login input[type="password"] { height: 40px; }
 form#admin-login button.btn.btn-default { margin-top: 8px; width: 100%; height: 50px; font-size: 18px; color: #ffffff; font-weight: bold; background-color: #0059B2; border-color: #0059B2; }

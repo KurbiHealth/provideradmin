@@ -8,27 +8,44 @@
     <!-- FAVICON -->
     <link rel="shortcut icon" href="./images/favicon.png" />
     
+    <!-- STYLESHEETS -->
     <link rel="stylesheet" href="node_modules/ng-admin/build/ng-admin.min.css"/>
     <link rel="stylesheet" href="main.css"/>
     <link rel="stylesheet" href="node_modules/angularjs-color-picker/dist/angularjs-color-picker.min.css" />
     <!-- only include if you use bootstrap -->
     <link rel="stylesheet" href="node_modules/angularjs-color-picker/dist/themes/angularjs-color-picker-bootstrap.min.css" />
+    
+    <!-- JS DEPENDENCIES -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="node_modules/bootbox/bootbox.min.js"></script>
 </head>
 <body ng-app="myApp">
     <div ui-view></div>
     <script src="https://use.fontawesome.com/9702cfc1b4.js"></script>
     <script src="node_modules/ng-admin/build/ng-admin.min.js"></script>
     <script type="text/javascript">
-        var user = window.localStorage.getItem('user');
         
-        if (!user) {
-            window.location.href = "./login.html";
-        }
+      // CHECK FOR LOGGED USER
+      var token = window.localStorage.getItem("http://kpadmin-jwt");
+      var user = window.localStorage.getItem('user');
+      
+      if (!user || !token) {
+          window.location.href = "./login.html";
+      }
 
-        function logout() {
-            window.localStorage.removeItem('user');
-            window.location.href = "./login.html";
-        }
+      function logout() {
+      	bootbox.confirm("You are about to logout. Are you sure?", function(result) {
+      	  if (result == true) {
+      	  	window.localStorage.removeItem('user');
+      	  	window.localStorage.removeItem('username');
+      	  	window.localStorage.removeItem('http://kpadmin-jwt');
+      	  	window.location.href = "./login.html";
+      	  }
+      	});    
+      }
+        
     </script>
     <script src="node_modules/tinycolor2/dist/tinycolor-min.js"></script>
     <script src="node_modules/angularjs-color-picker/dist/angularjs-color-picker.min.js"></script>

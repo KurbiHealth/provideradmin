@@ -39,6 +39,7 @@ a, a:visited { color: #596672; }
 .reply-to-conversation-btn { margin:10px 0; }
 .chat-message-source-patient { color: red !important; font-size: 18px !important; }
 
+.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;-ms-word-break: break-all;word-break: break-all;word-break: break-word;}
 
 /*----------------------------------------------------------------------
  LOGIN PAGE 

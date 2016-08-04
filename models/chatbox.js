@@ -1,4 +1,4 @@
-module.exports = function(nga,chatbox,customizations) {
+module.exports = function(nga,chatbox,customizations,chatroom) {
 
     // LIST VIEW
     var listViewActionsTemplate = '<ma-export-to-csv-button entity="::entity" datastore="::datastore"></ma-export-to-csv-button>' +
@@ -14,6 +14,7 @@ module.exports = function(nga,chatbox,customizations) {
     ])
     //.listActions(['show','edit','delete'])
     .actions(listViewActionsTemplate)
+    .batchActions([])
     ;
 
     // SHOW VIEW
@@ -30,12 +31,24 @@ module.exports = function(nga,chatbox,customizations) {
             .label('Last Updated'),
         nga.field('snippet')
             .label('Web Snippet')
-        ,nga.field('customizations','reference_many')
+            .cssClasses(['dont-break-out show-value col-sm-10 col-md-8 col-lg-7'])
+        ,nga.field('customizations','referenced_list')
             .label('History of changes')
             .targetEntity(customizations)
-            .targetField(nga.field('chat_color'))
-        ,nga.field('')
+            .targetReferenceField('chatbox')
+            .targetFields([
+                nga.field('chat_color'),
+                nga.field('chat_headline'),
+                nga.field('chat_avatar')
+            ])
+        ,nga.field('chatrooms','referenced_list')
             .label('Conversations') // referenced_list of ChatRoom(s)
+            .targetEntity(chatroom)
+            .targetReferenceField('key')
+            .targetFields([
+                nga.field('dt_create','datetime')
+                ,nga.field('url')
+            ])
     ])
     .title('Chatbox Detail')
     .actions(showViewActionsTemplate);
@@ -55,6 +68,10 @@ module.exports = function(nga,chatbox,customizations) {
     // EDITION VIEW
     chatbox.editionView()
     .fields(chatbox.creationView().fields())
+
+    // DELETION VIEW
+    chatbox.deletionView()
+        .title('Delete this chatbox');
 
     return chatbox;
 

@@ -1,6 +1,6 @@
 var chatboxConfigControllerTemplate =
 
-'<style>input{margin-bottom:10px;}.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;-ms-word-break: break-all;word-break: break-all;word-break: break-word;}' + 
+'<style>input{margin-bottom:10px;}' + 
 '.color-picker-action-close{overflow:auto;width:60px !important;}' +
 '.color-picker-swatch{width:100px !important;}' +  
 '</style>' +

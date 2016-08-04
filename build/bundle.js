@@ -479,7 +479,7 @@ module.exports = exports['default'];
 
 },{}],8:[function(require,module,exports){
 exports.__esModule = true;
-var chatboxConfigControllerTemplate = '<style>input{margin-bottom:10px;}.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;-ms-word-break: break-all;word-break: break-all;word-break: break-word;}' + '.color-picker-action-close{overflow:auto;width:60px !important;}' + '.color-picker-swatch{width:100px !important;}' + '</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Configure your Chat Box</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-6">' + '<h4>Modify This</h4>' + '<label for="avatar">Avatar</label>' + '<input type="file" size="10" ng-model="controller.avatar" class="form-control" placeholder="avatar" name="avatar" />' + '<label for="color">Accent Color</label>' + '<color-picker ng-model="controller.color" options="options"></color-picker>' + '<span style="display:block;width:1px;height:10px;"></span>' + '<label for="headline">Headline</label>' + '<input type="text" size="10" ng-model="controller.headline" class="form-control" placeholder="headline" name="headline" />' + '<a class="btn btn-default" ng-click="controller.submitForm()">Save</a>' + '</div>' + '<div class="col-lg-6">' + '<h4>Snippet Display</h4>' + '<p><i>When the snippet appears, copy it and then paste it into your website\'s html or content management system.</i></p>' + '<div id="chatSnippet" class="dont-break-out" style="width:100%;display:block;border:1px solid grey;border-radius:3px;min-height:33px;padding:20px;margin-bottom:20px;"></div>' + '</div>' + '</div>';
+var chatboxConfigControllerTemplate = '<style>input{margin-bottom:10px;}' + '.color-picker-action-close{overflow:auto;width:60px !important;}' + '.color-picker-swatch{width:100px !important;}' + '</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Configure your Chat Box</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-6">' + '<h4>Modify This</h4>' + '<label for="avatar">Avatar</label>' + '<input type="file" size="10" ng-model="controller.avatar" class="form-control" placeholder="avatar" name="avatar" />' + '<label for="color">Accent Color</label>' + '<color-picker ng-model="controller.color" options="options"></color-picker>' + '<span style="display:block;width:1px;height:10px;"></span>' + '<label for="headline">Headline</label>' + '<input type="text" size="10" ng-model="controller.headline" class="form-control" placeholder="headline" name="headline" />' + '<a class="btn btn-default" ng-click="controller.submitForm()">Save</a>' + '</div>' + '<div class="col-lg-6">' + '<h4>Snippet Display</h4>' + '<p><i>When the snippet appears, copy it and then paste it into your website\'s html or content management system.</i></p>' + '<div id="chatSnippet" class="dont-break-out" style="width:100%;display:block;border:1px solid grey;border-radius:3px;min-height:33px;padding:20px;margin-bottom:20px;"></div>' + '</div>' + '</div>';
 
 exports.default = chatboxConfigControllerTemplate;
 module.exports = exports['default'];
@@ -1008,14 +1008,6 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     var customizations = nga.entity('customization');
     admin.addEntity(create(nga, customizations));
 
-    // chatbox
-    var create = require('./models/chatbox');
-    admin.addEntity(create(nga, nga.entity('chatbox'), customizations));
-
-    // articles
-    var create = require('./models/articles');
-    admin.addEntity(create(nga, nga.entity('articles')));
-
     // chatroom replies
     var create = require('./models/chatroomreplies');
     var chatReplies = nga.entity('chatroomreplies');
@@ -1023,13 +1015,22 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
 
     // chatroom
     var create = require('./models/chatroom');
-    admin.addEntity(create(nga, nga.entity('chatroom'), chatReplies));
+    var chatroom = nga.entity('chatroom');
+    admin.addEntity(create(nga, chatroom, chatReplies));
+
+    // chatbox
+    var create = require('./models/chatbox');
+    admin.addEntity(create(nga, nga.entity('chatbox'), customizations, chatroom));
+
+    // articles
+    var create = require('./models/articles');
+    admin.addEntity(create(nga, nga.entity('articles')));
 
     /***************************************
      * CUSTOM MENU
      ***************************************/
 
-    admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard')).addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;')).addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu().title('ChatBox Customize').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;').link('/chatbox_config'))).addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
+    admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard')).addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;')).addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))).addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
 
     /***************************************
      * CUSTOM HEADER
@@ -1104,19 +1105,19 @@ module.exports = function (nga, articles) {
 };
 
 },{}],13:[function(require,module,exports){
-module.exports = function (nga, chatbox, customizations) {
+module.exports = function (nga, chatbox, customizations, chatroom) {
 
     // LIST VIEW
     var listViewActionsTemplate = '<ma-export-to-csv-button entity="::entity" datastore="::datastore"></ma-export-to-csv-button>' + '<edit-chat-box entry="entry" type="create"></edit-chat-box>';
     var listViewListActionsTemplate = '<ma-show-button size="xs" entry="entry" entity="entity"></ma-show-button>' + '<edit-chat-box size="xs" entry="entry" type="edit"></edit-chat-box>' + '<ma-delete-button size="xs" entry="entry" entity="entity"></ma-delete-button>';
     chatbox.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('actions', 'template').template(listViewListActionsTemplate)])
     //.listActions(['show','edit','delete'])
-    .actions(listViewActionsTemplate);
+    .actions(listViewActionsTemplate).batchActions([]);
 
     // SHOW VIEW
     var showViewActionsTemplate = '<ma-list-button entry="entry" entity="entity"></ma-list-button>' + '<edit-chat-box entry="entry" type="edit"></edit-chat-box>' + '<ma-delete-button entry="entry" entity="entity"></ma-delete-button>';
-    chatbox.showView().fields([nga.field('owner'), nga.field('id'), nga.field('dt_create', 'datetime').label('Created'), nga.field('dt_update', 'datetime').label('Last Updated'), nga.field('snippet').label('Web Snippet'), nga.field('customizations', 'reference_many').label('History of changes').targetEntity(customizations).targetField(nga.field('chat_color')), nga.field('').label('Conversations') // referenced_list of ChatRoom(s)
-    ]).title('Chatbox Detail').actions(showViewActionsTemplate);
+    chatbox.showView().fields([nga.field('owner'), nga.field('id'), nga.field('dt_create', 'datetime').label('Created'), nga.field('dt_update', 'datetime').label('Last Updated'), nga.field('snippet').label('Web Snippet').cssClasses(['dont-break-out show-value col-sm-10 col-md-8 col-lg-7']), nga.field('customizations', 'referenced_list').label('History of changes').targetEntity(customizations).targetReferenceField('chatbox').targetFields([nga.field('chat_color'), nga.field('chat_headline'), nga.field('chat_avatar')]), nga.field('chatrooms', 'referenced_list').label('Conversations') // referenced_list of ChatRoom(s)
+    .targetEntity(chatroom).targetReferenceField('key').targetFields([nga.field('dt_create', 'datetime'), nga.field('url')])]).title('Chatbox Detail').actions(showViewActionsTemplate);
 
     // CREATION VIEW
     chatbox.creationView().fields([nga.field('chat_avatar', 'file')
@@ -1126,6 +1127,9 @@ module.exports = function (nga, chatbox, customizations) {
 
     // EDITION VIEW
     chatbox.editionView().fields(chatbox.creationView().fields());
+
+    // DELETION VIEW
+    chatbox.deletionView().title('Delete this chatbox');
 
     return chatbox;
 };

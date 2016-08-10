@@ -287,8 +287,8 @@ myApp.config(function(RestangularProvider) {
  * http://ng-admin-book.marmelab.com/doc/Custom-pages.html
  ***************************************/
 
-//myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
-myApp.constant('chatServerURL', 'http://kchat:8080/chatbox');
+myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
+//myApp.constant('chatServerURL', 'http://kchat:8080/chatbox');
 
 // CHATBOX CUSTOMIZATION PAGE
 import chatboxConfigController from './custom_pages/chatboxconfig/chatboxconfig';

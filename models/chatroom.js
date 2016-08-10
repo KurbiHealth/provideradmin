@@ -17,7 +17,12 @@ module.exports = function(nga,chatroom,chatReplies) {
     ])
     .title('Conversations')
     .listActions(['show'])
-    .batchActions([]);
+    .batchActions([])
+    .filters([
+        nga.field('dt_create')
+            .label('Created'),
+        nga.field('messages')
+    ]);
 
     // SHOW VIEW
     chatroom.showView()

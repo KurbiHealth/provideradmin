@@ -70,26 +70,30 @@ myApp.config(function(RestangularProvider) {
   
     RestangularProvider.addFullRequestInterceptor(function(element, operation, what, url, 
         headers, params, httpConfig) {
-        //console.log('url',angular.copy(url));
-        // STAMPLAY CANONICAL URL IS:
-        // https://bkschool.stamplayapp.com/api/cobject/v1/audio
-        // ?n=10&sort=audio_url&page=1&per_page=10
+        console.log('url',angular.copy(url));
         //console.log('element: ',element);
         //console.log('operation: ',operation);
         //console.log('what: ',what);
         //console.log('headers: ',headers);
-        //console.log('params: ',params);
+        console.log('params: ',params);
         //console.log('httpConfig',httpConfig);
 
-        // FIX PAGINATION
-        // STAMPLAY'S FORMAT == n=21&page=2&per_page=10
-
-        console.log('request operation,',operation);
-        //console.log('request what,',what);
+        /*
+         * FIX ISSUES FOR STAMPLAY API
+         */
 
         if (operation == 'getList') {
-            params.page = params._page;
-            params.per_page = params._perPage;
+            // FIX PAGINATION
+            // STAMPLAY CANONICAL URL IS:
+            // https://bkschool.stamplayapp.com/api/cobject/v1/audio
+            //                  ? n=10 & sort=audio_url & page=1 & per_page=10
+
+            if(!params.page){
+                params.page = params._page;
+            }
+            if(!params.per_page){
+                params.per_page = params._perPage;
+            }
             if(params._sortField){
                 params.sort = '';
                 if(params._sortDir == 'DESC') params.sort = '-';
@@ -100,16 +104,156 @@ myApp.config(function(RestangularProvider) {
             delete params._sortField;
             delete params._sortDir;
         }
-        
+
+        console.log('params post Stamplay processing:',params);
+
         return { element: element, params: params };
     });
+
+});
+
+
+/***************************************
+ * POST-RESTANGULAR INTERCEPTOR FUNCTIONS
+ ***************************************/
+
+myApp.config(function ($httpProvider) {
+    
+    // USING 'unshift' TO RUN THESE FUNCTIONS FIRST!!!!
+    $httpProvider.interceptors.unshift(addContentTypeToHeader);
+
+    // these functions run in regular order (after Restangular interceptors)
+    $httpProvider.interceptors.push(fixStamplayIssues);
+
+// **************************************************************************
+
+    /*
+     * FIX ISSUES FOR STAMPLAY API
+     */
+
+    // Angular removes the header 'Content-Type' if request is GET.
+    // This function is a hack to add the header back in, because Stamplay 
+    // requires the header.
+    function addContentTypeToHeader() {
+        return {
+            request : requestInterceptor
+        };
+
+        function requestInterceptor(config) {
+            if (angular.isDefined(config.headers['Content-Type']) && !angular.isDefined(config.data))
+                config.data = '';
+
+            return config;
+        }
+    }
+
+    // When NG-Admin does a list GET, it receives all fields for that data model, and those fields
+    // persist in the dataStore, even if the editionView only defines a couple of fields. Which means
+    // that the un-editable fields in Stamplay must be removed before doing a PUT
+    function fixStamplayIssues($q) {
+        return {
+            request : function(config) {
+                config = angular.copy(config);
+
+                if(config.method === 'PUT'){
+                    delete config.data.__v;
+                    delete config.data._id;
+                    delete config.data.appId;
+                    delete config.data.cobjectId;
+                    delete config.data.dt_create;
+                    delete config.data.dt_update;
+                    delete config.data.id;
+                    delete config.data.actions;
+                }
+
+                if(config.method == 'GET' && config.params){
+                    
+                    // translate NGA filter(s) to Stamplay format
+
+                    // hack to fix an NGA problem: when using 'referenced_list', 
+                    // [object Object] appears in url
+                    if(config.params._filters && '[object Object]' in config.params._filters){
+                        var temp = config.params._filters['[object Object]'];
+                        delete config.params._filters['[object Object]'];
+                        config.params.chatRoomId = temp; // Stamplay uses a straight key:value pair in GET
+                        if(isEmpty(config.params._filters)){
+                            delete config.params._filters;
+                        }
+                    }
+// PROBLEM
+/* NGA sends related lists as a field:key value in _filter. Stamplay
+accepts ?field=value for search in related object. However, Stamplay queries
+are expected to be part of ?where={}. So how do I know which _filter values
+are foreign keys and which are for "where"? */
+
+                    // 'referenced_list' sends the foreign key in config.params._filters
+                    // but it should be in config.params for Stamplay
+                    if(config.params._filters){
+                        var obj = config.params._filters;
+                        for(var key in obj){
+                            config.params[key] = obj[key];
+                            delete config.params._filters[key];
+                        }
+                        if(isEmpty(config.params._filters)){
+                            delete config.params._filters;
+                        }
+                    }
+
+                    // if all the previous fixes have emptied the NGA filters, then delete it
+                    if(isEmpty(config.params._filters)){
+                        delete config.params._filters;
+                    }
+
+                }
+
+                return config || $q.when(config);
+            }
+        };
+    }
+
+    // from http://stackoverflow.com/questions/4994201/is-object-empty
+    // Speed up calls to hasOwnProperty
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+    function isEmpty(obj) {
+
+        // null and undefined are "empty"
+        if (obj == null) return true;
+
+        // Assume if it has a length property with a non-zero value
+        // that that property is correct.
+        if (obj.length > 0)    return false;
+        if (obj.length === 0)  return true;
+
+        // If it isn't an object at this point
+        // it is empty, but it can't be anything *but* empty
+        // Is it empty?  Depends on your application.
+        if (typeof obj !== "object") return true;
+
+        // Otherwise, does it have any properties of its own?
+        // Note that this doesn't handle
+        // toString and valueOf enumeration bugs in IE < 9
+        for (var key in obj) {
+            if (hasOwnProperty.call(obj, key)) return false;
+        }
+
+        return true;
+    }
+
+});
+
+/********************************************
+ * RESTANGULAR response INTERCEPTOR FUNCTIONS
+ ********************************************/
+
+myApp.config(function(RestangularProvider) {
 
     RestangularProvider.addResponseInterceptor(function(data,operation,what,url,response,deferred){
 
         var newResponse;
         console.log('Response',response);
         //console.log(typeof response.data.data);
-        console.log('Data',data);
+        //console.log('Data',data);
 
         // ADJUST STAMPLAY'S STRUCTURE TO MATCH WHAT NG-ADMIN EXPECTS
         if('data' in response.data){
@@ -133,69 +277,6 @@ myApp.config(function(RestangularProvider) {
         return newResponse;
 
     });
-
-});
-
-
-/***************************************
- * POST-RESTANGULAR INTERCEPTOR FUNCTIONS
- ***************************************/
-
-myApp.config(function ($httpProvider) {
-    
-    // USING 'unshift' TO RUN THESE FUNCTIONS FIRST!!!!
-    $httpProvider.interceptors.unshift(addContentTypeToHeader);
-
-    // Angular removes the header 'Content-Type' if request is GET.
-    // This function is a hack to add the header back in, because some API's require the header.
-    function addContentTypeToHeader() {
-        return {
-            request : requestInterceptor
-        };
-
-        function requestInterceptor(config) {
-            if (angular.isDefined(config.headers['Content-Type']) && !angular.isDefined(config.data))
-                config.data = '';
-
-            return config;
-        }
-    }
-
-    // these functions run in regular order (after Restangular interceptors)
-    $httpProvider.interceptors.push(fixStamplayIssues);
-
-    // When NG-Admin does a list GET, it receives all fields for that data model, and those fields
-    // persist in the dataStore, even if the editionView only defines a couple of fields. Which means
-    // that the un-editable fields in Stamplay must be removed before doing a PUT
-    function fixStamplayIssues($q) {
-        return {
-            request : function(config) {
-                config = angular.copy(config);
-                if(config.method === 'PUT'){
-                    delete config.data.__v;
-                    delete config.data._id;
-                    delete config.data.appId;
-                    delete config.data.cobjectId;
-                    delete config.data.dt_create;
-                    delete config.data.dt_update;
-                    delete config.data.id;
-                    delete config.data.actions;
-                }
-
-                if(config.method == 'GET' && config.params){
-                    if(config.params._filters && '[object Object]' in config.params._filters){
-                        var temp = config.params._filters['[object Object]'];
-                        delete config.params._filters;
-                        config.params.chatRoomId = temp;
-                    }
-                    //config.url += '/' + config.params.id;
-                    //delete config.params.id;
-                }
-
-                return config || $q.when(config);
-            }
-        };
-    }
 
 });
 
@@ -268,6 +349,8 @@ myApp.config(['FieldViewConfigurationProvider', function(fvp) {
 myApp.directive('stamplayArrStrings', stamplayArrayOfStringsDirective);
 myApp.directive('objKeyValueField', ObjKeyValueFieldDirective);
 
+myApp.directive('dashboardSummary', require('./custom_dashboard/dashboardSummary'));
+
 myApp.directive('replyToChatConversation', ['$location', function ($location) {
     return {
         restrict: 'E',
@@ -323,33 +406,36 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
     // add entities
     // ==================================================
 
-    // users (https://bkschool.stamplayapp.com/api/user/v1/)
-    var create = require('./models/users');
-    var userEntity = nga.entity('users').baseApiUrl('https://kurbi.stamplayapp.com/api/user/v1/');
-    admin.addEntity(create(nga,userEntity));
-
+    var createUser = require('./models/users');
+    var userEntity = nga.entity('users')
+                        .baseApiUrl('https://kurbi.stamplayapp.com/api/user/v1/');
+    
     // customization (of chatbox)
-    var create = require('./models/customization');
+    var createCustomization = require('./models/customization');
     var customizations = nga.entity('customization');
-    admin.addEntity(create(nga,customizations));
 
     // chatroom replies
-    var create = require('./models/chatroomreplies');
+    var createReplies = require('./models/chatroomreplies');
     var chatReplies = nga.entity('chatroomreplies');
-    admin.addEntity(create(nga,chatReplies,nga.entity('chatroom')));
 
     // chatroom
-    var create = require('./models/chatroom');
+    var createChatroom = require('./models/chatroom');
     var chatroom = nga.entity('chatroom');
-    admin.addEntity(create(nga,chatroom,chatReplies));
 
     // chatbox
-    var create = require('./models/chatbox');
-    admin.addEntity(create(nga,nga.entity('chatbox'),customizations,chatroom));
+    var createChatbox = require('./models/chatbox');
+    var chatbox = nga.entity('chatbox');
 
     // articles
-    var create = require('./models/articles');
-    admin.addEntity(create(nga,nga.entity('articles')));
+    var createArticles = require('./models/articles');
+    var articles = nga.entity('articles');
+
+    admin.addEntity(createUser(nga,userEntity));
+    admin.addEntity(createCustomization(nga,customizations));
+    admin.addEntity(createReplies(nga,chatReplies,chatroom));
+    admin.addEntity(createChatroom(nga,chatroom,chatReplies));
+    admin.addEntity(createChatbox(nga,chatbox,customizations,chatroom));
+    admin.addEntity(createArticles(nga,articles));
 
 
 /***************************************
@@ -395,7 +481,7 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
  * CUSTOM DASHBOARD
  * http://ng-admin-book.marmelab.com/doc/Dashboard.html
  ***************************************/
-
+admin.dashboard(require('./custom_dashboard/main')(nga, admin, chatReplies));
 
 /***************************************
  * CUSTOM ERROR MESSAGES

@@ -1,4 +1,4 @@
-function chatboxConfigController($stateParams, notification, Restangular, $http, chatServerURL,$scope) {
+function chatboxConfigController($stateParams, notification, Restangular, $http, chatServerURL,$scope,$window) {
    
 	// URL is the location of the chat endpoints
 	var URL = chatServerURL;
@@ -29,14 +29,22 @@ function chatboxConfigController($stateParams, notification, Restangular, $http,
     // Check to see if there is a recent customization record available; if there is, load it and put values into form fields
     if($stateParams.chatBoxId){
 		var currView = 'edit';
-		var chatBoxId = $stateParams.chatBoxId;
-		Restangular.one('chatbox',chatBoxId).get()
+		this.chatBoxId = $stateParams.chatBoxId;
+		var that = this;
+		Restangular.one('chatbox',that.chatBoxId).get()
 			.then(function(result){
-				var chatBoxData = result.data.plain();
-
+				var cb = result.data.plain();
+				that.chatBoxData = cb;
+				that.latestCustomizationId = cb.customizations[cb.customizations.length - 1];
+				Restangular.one('customization',that.latestCustomizationId).get()
+					.then(function(result){
+						result = result.data.plain();
+						that.avatar = result.chat_avatar;
+						that.color = result.chat_color;
+						that.headline = result.chat_headline;
+					});
 			});
     }else{
-console.log('new chatBox');
     	var currView = 'new';
     }
 
@@ -57,9 +65,9 @@ console.log('new chatBox');
 			.then(function(response) {
 				// Add snippet to UI
 				console.log(response);
-				var targetDiv = angular.element(document.getElementById('chatSnippet'));
-				targetDiv.text("<script>"+response.data.snippet + "</script>");
-				apiKey = response.apiKey;
+				//var targetDiv = angular.element(document.getElementById('chatSnippet'));
+				//targetDiv.text("<script>"+response.data.snippet + "</script>");
+				//apiKey = response.apiKey;
 				return response.data;
 			}, function(err) {
 				console.log("There was an error saving.",err);
@@ -78,12 +86,9 @@ console.log('new chatBox');
 				Restangular.all('customization')
 					.post(data)
 					.then(function(response) {
-console.log('customization response',response);
 					// save the snippet & link to Customization rcd 
 					// to the ChatBox record
-console.log('chatBoxId',chatBoxId,'snippet',snippet);
 					var customizationId = response.data.id;
-console.log('customizationId',customizationId);
 
 					var chatBoxData = {
 						'snippet': snippet,
@@ -94,20 +99,17 @@ console.log('customizationId',customizationId);
 						.get()
 						.then(function(result){
 							var temp = result.data.plain();
-console.log('result from chatbox get',temp);
 							if(!temp.customizations){
 								customArr = [];
 							}else{
 								var customArr = temp.customizations;
 							}
-// TO DO save chatbox.id in customization.chatbox
 							customArr.push(customizationId);
 							chatBoxData.customizations = customArr;
-console.log('chatbox data',chatBoxData);
 							Restangular.one('chatbox',chatBoxId)
 								.customPUT(chatBoxData)
 								.then(function(result){
-console.log('updated chatbox with snippet and new customizations array',result.data.plain());
+									$window.location.href = '/#/chatbox/show/' + chatBoxId;
 								})
 						});
 				}, function(err) {
@@ -118,30 +120,33 @@ console.log('updated chatbox with snippet and new customizations array',result.d
 
 		if(currView == 'edit'){
 			// send chatBoxId to bot API, it will update the js,html,css
-/*			var data = {
-
-			};
+			// NOTE: customizationFormData is defined above
+			customizationFormData.chatBoxId = that.chatBoxId;
 			$http
-			.put(URL,data,function(result){
-
-			})
-
-			// create a new customization record
+			.put(URL,customizationFormData)
 			.then(function(result){
-				Restangular.one('customization').post(
-
-				)
+				var data = {
+					'chat_avatar': customizationFormData.avatar,
+					'chat_color': customizationFormData.color,
+					'chat_headline': customizationFormData.headline,
+					'chatbox': that.chatBoxId
+				};
+				Restangular.all('customization').post(data)
 			// insert the new customization id into the chatbox record
 				.then(function(result){
-					var data = {
-
-					};
-					Restangular.one('chatbox',chatBoxId).put(data)
+					result = result.data.plain();
+					
+					var newCustomizationId = result.id;
+					
+					var customizationArr = that.chatBoxData.customizations;
+					customizationArr.push(newCustomizationId);
+					Restangular.one('chatbox',that.chatBoxId)
+					.customPUT({customizations: customizationArr})
 					.then(function(result){
-
+						$window.location.href = '/#/chatbox/show/' + that.chatBoxId;
 					});
 				})
-			}); */
+			});
 
 		} // END if(currView == 'edit')
 

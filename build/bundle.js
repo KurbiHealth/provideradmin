@@ -941,14 +941,16 @@ myApp.config(function ($httpProvider) {
         }
     }
 
-    // When NG-Admin does a list GET, it receives all fields for that data model, and those fields
-    // persist in the dataStore, even if the editionView only defines a couple of fields. Which means
-    // that the un-editable fields in Stamplay must be removed before doing a PUT
     function fixStamplayIssues($q) {
         return {
             request: function request(config) {
                 config = angular.copy(config);
 
+                // When NG-Admin does a list GET, it receives all fields for
+                // that data model, and those fields persist in the dataStore,
+                // even if the editionView only defines a couple of fields.
+                // Which means that the un-editable fields in Stamplay must be
+                // removed before doing a PUT
                 if (config.method === 'PUT') {
                     delete config.data.__v;
                     delete config.data._id;
@@ -960,19 +962,17 @@ myApp.config(function ($httpProvider) {
                     delete config.data.actions;
                 }
 
+                // translate NGA filter(s) to Stamplay format
                 if (config.method == 'GET' && config.params) {
-
-                    // translate NGA filter(s) to Stamplay format
+                    config.params.where = {};
+                    var where = config.params.where;
 
                     // hack to fix an NGA problem: when using 'referenced_list',
                     // [object Object] appears in url
                     if (config.params._filters && '[object Object]' in config.params._filters) {
                         var temp = config.params._filters['[object Object]'];
                         delete config.params._filters['[object Object]'];
-                        config.params.chatRoomId = temp; // Stamplay uses a straight key:value pair in GET
-                        if (isEmpty(config.params._filters)) {
-                            delete config.params._filters;
-                        }
+                        where.chatRoomId = temp; // Stamplay uses a straight key:value pair in GET
                     }
                     // PROBLEM
                     /* NGA sends related lists as a field:key value in _filter. Stamplay
@@ -983,22 +983,22 @@ myApp.config(function ($httpProvider) {
                     // 'referenced_list' sends the foreign key in config.params._filters
                     // but it should be in config.params for Stamplay
                     if (config.params._filters) {
+                        console.log('about to fix _filters');
                         var obj = config.params._filters;
                         for (var key in obj) {
-                            config.params[key] = obj[key];
+                            where[key] = obj[key];
+                            //where[key] = {"$regex": '/' + obj[key] + '/'};
                             delete config.params._filters[key];
-                        }
-                        if (isEmpty(config.params._filters)) {
-                            delete config.params._filters;
                         }
                     }
 
-                    // if all the previous fixes have emptied the NGA filters, then delete it
+                    // if all the previous fixes have emptied the NGA filter object,
+                    // then delete it
                     if (isEmpty(config.params._filters)) {
                         delete config.params._filters;
                     }
                 }
-
+                console.log('config post interceptor and Stamplay fixes', config);
                 return config || $q.when(config);
             }
         };
@@ -1347,7 +1347,7 @@ module.exports = function (nga, chatroomreplies, chatRoom) {
     ]).title('Replies').listActions(['show', 'edit', 'delete']).filters([
     //nga.field('q').label('Search').pinned(true)
     //,
-    nga.field('qa').label('adrg').template('<div class="input-group"><input type="text" ng-model="value" placeholder="Search" class="form-control"></input><span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span></div>')]);
+    nga.field('replyText').label('Search Replies').pinned(true).template('<div class="input-group"><input type="text" ng-model="value" placeholder="Search" class="form-control"></input><span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span></div>')]);
 
     // SHOW VIEW
     chatroomreplies.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('chatRoomId').label('Reply Id'), nga.field('recipient'), nga.field('replyText', 'wysiwyg')]).title('Reply Detail');

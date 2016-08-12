@@ -10,7 +10,8 @@
     "browserify": "13.0.0",
     "ng-admin": "latest",
     "videogular": "^1.4.1",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "bootbox": "latest"
   },
   "devDependencies": {
     "admin-config": "^0.11.0",

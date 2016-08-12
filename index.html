@@ -28,7 +28,8 @@
     <script type="text/javascript">
         
       // CHECK FOR LOGGED USER
-      var token = window.localStorage.getItem("http://kpadmin-jwt");
+      var currUrl = window.location.origin;
+      var token = window.localStorage.getItem(currUrl + '-jwt');
       var user = window.localStorage.getItem('user');
       
       if (!user || !token) {

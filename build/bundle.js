@@ -138,7 +138,7 @@ var ObjKeyValueFieldConf = function (_Field) {
 exports.default = ObjKeyValueFieldConf;
 module.exports = exports["default"];
 
-},{"admin-config/lib/Field/Field":24}],5:[function(require,module,exports){
+},{"admin-config/lib/Field/Field":26}],5:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = ObjKeyValueFieldDirective;
 function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
@@ -345,7 +345,7 @@ exports.default = stamplayArrayOfStrings;
 stamplayArrayOfStrings.$inject = ['NgAdminConfiguration'];
 module.exports = exports['default'];
 
-},{"admin-config/lib/entry":39}],8:[function(require,module,exports){
+},{"admin-config/lib/entry":41}],8:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -405,7 +405,7 @@ var StamplayArrayStrField = function (_EmbeddedListField) {
 exports.default = StamplayArrayStrField;
 module.exports = exports["default"];
 
-},{"admin-config/lib/Field/EmbeddedListField":23}],9:[function(require,module,exports){
+},{"admin-config/lib/Field/EmbeddedListField":25}],9:[function(require,module,exports){
 exports.__esModule = true;
 /*
 getReadWidget:   DISPLAYED IN listView AND showView
@@ -431,6 +431,46 @@ exports.default = {
 module.exports = exports['default'];
 
 },{}],10:[function(require,module,exports){
+exports.__esModule = true;
+function botbuilderController($stateParams, notification, Restangular, $q, $scope) {
+
+	/* 
+ NOTE: 
+ 	app.js (this) has 
+ 		var $scope		- undefined
+ 		var angular 	- has utility functions
+ 		var jQuery & var $
+ 		var joint		- core Joint.js object
+ 		var qad			- belongs to this app
+ 	THEN $scope has
+ 		var controller 	- this
+ 	THEN window has
+ 		everything that app.js (this) has
+ NOTE: 
+ 	it looks like 'window' is the root scope, and the only reason the 
+ 	backbone app and the angular app don't conflict is that the botbuilder app
+ 	uses var app and the angular app doesn't. Otherwise, unless there is a 
+ 	dependency function that both libraries share, they should co-exist
+ */
+
+}
+
+botbuilderController.$inject = ['$stateParams', 'notification', 'Restangular', '$q', '$scope'];
+
+exports.default = botbuilderController;
+module.exports = exports['default'];
+
+},{}],11:[function(require,module,exports){
+exports.__esModule = true;
+
+exports.default = function () {
+
+  return "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\"/>\n    <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\"/>\n\n    <title>Kurbi Bots</title>\n\n    <link href=\"/custom_pages/botbuilder/cms/styles/styles.api.min.css\" rel=\"stylesheet\" />\n    \n    <!-- this file makes the arrows work correctly -->\n    <!--<link href=\"rappid/v1.6/rappid.min.css\" rel=\"stylesheet\" />-->\n    <link href=\"/custom_pages/botbuilder/jointjs/joint.css\" rel=\"stylesheet\" />\n    \n    <link href=\"/custom_pages/botbuilder/css/header.css\" rel=\"stylesheet\"/>\n    <!--<link href=\"/custom_pages/botbuilder/css/side-menu.css\" rel=\"stylesheet\" />-->\n    <link href=\"/custom_pages/botbuilder/css/toolbar.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/statusbar.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/paper.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/preview.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/halo.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/tooltip.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/snippet.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/dialog.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/index.css\" rel=\"stylesheet\"/>\n\n    <link rel=\"stylesheet\" href=\"https://opensource.keycdn.com/fontawesome/4.6.3/font-awesome.min.css\" integrity=\"sha384-Wrgq82RsEean5tP3NK3zWAemiNEXofJsTwTyHmNb/iL3dP/sZJ4+7sOld1uqYJtE\" crossorigin=\"anonymous\">\n\n  </head>\n<body>\n\n<script>\n  SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement || function(toElement) {\n  return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());\n  };\n</script>\n\n    <main class=\"content layout_sidebar\">\n\n      <section id=\"app\">\n\n        <div id=\"header\">\n            <h1>MENU</h1>\n            <span id=\"top-nav\">\n              <button class=\"btn load-example\">Reset Bot</button>\n              <button class=\"btn preview-dialog disabled\">Preview Bot</button>\n            </span>\n        </div>\n\n        <div id=\"main\">\n\n          <div id=\"toolbar\">\n            <h4>BOTS</h4>\n            <span id=\"toolbar-buttons-span\">\n              <button class=\"btn add-question\">Question</button>\n              <button class=\"btn add-answer\">Message</button>\n              <button class=\"btn add-icon\">Avatars</button>\n              <!--<button class=\"btn code-snippet\">Code Snippet</button>-->\n              <!--<button class=\"btn clear\">Clear Canvas</button>-->\n            </span>\n          </div>\n\n          <div id=\"paper\"></div>\n\n          <div id=\"statusbar\">\n            <span class=\"message\"></span>\n          </div>\n\n          <div id=\"preview\" class=\"preview\">\n          </div>\n\n        </div><!-- END #main -->\n\n      </section>\n\n    </main>\n\n    <!--<script src=\"/custom_pages/botbuilder/vendor/jquery/jquery.min.js\"></script>-->\n    <script src=\"/custom_pages/botbuilder/vendor/lodash/lodash.min.js\"></script>\n    <script src=\"/custom_pages/botbuilder/vendor/backbone/backbone-min.js\"></script>\n    <!--<script src=\"/custom_pages/botbuilder/rappid/v1.6/rappid.min.js\"></script>-->\n    <script src=\"/custom_pages/botbuilder/jointjs/joint.js\"></script>\n\n    <script src=\"/custom_pages/botbuilder/src/joint.shapes.qad.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/selection.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/factory.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/snippet.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/app.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/index.js\"></script>\n  </body>\n</html>";
+};
+
+module.exports = exports["default"];
+
+},{}],12:[function(require,module,exports){
 exports.__esModule = true;
 function chatboxConfigController($stateParams, notification, Restangular, $http, chatServerURL, $scope, $window) {
 
@@ -572,14 +612,14 @@ function chatboxConfigController($stateParams, notification, Restangular, $http,
 exports.default = chatboxConfigController;
 module.exports = exports['default'];
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 exports.__esModule = true;
 var chatboxConfigControllerTemplate = '<style>input{margin-bottom:10px;}' + '.color-picker-action-close{overflow:auto;width:60px !important;}' + '.color-picker-swatch{width:100px !important;}' + '</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Configure your Chat Box</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-6">' + '<h4>Modify This</h4>' + '<label for="avatar">Avatar</label>' + '<input type="file" size="10" ng-model="controller.avatar" class="form-control" placeholder="avatar" name="avatar" />' + '<label for="color">Accent Color</label>' + '<color-picker ng-model="controller.color" options="options"></color-picker>' + '<span style="display:block;width:1px;height:10px;"></span>' + '<label for="headline">Headline</label>' + '<input type="text" size="10" ng-model="controller.headline" class="form-control" placeholder="headline" name="headline" />' + '<a class="btn btn-default" ng-click="controller.submitForm()">Save</a>' + '</div>' + '</div>';
 
 exports.default = chatboxConfigControllerTemplate;
 module.exports = exports['default'];
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -754,14 +794,14 @@ exports.default = conversationReplyController;
 conversationReplyController.$inject = ['$stateParams', 'notification', 'Restangular', '$q'];
 module.exports = exports['default'];
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 exports.__esModule = true;
 var conversationReplyTemplate = '<style>input{margin-bottom:10px;}.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;' + '-ms-word-break: break-all;word-break: break-all;word-break: break-word;}.ta-editor{border: 1px solid gray;border-radius:5px;}</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Reply To A Question</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-12">' + '<h4>From a potential patient...</h4>' + '<p><b>Question:</b></p>' + '<p size="10" class="form-control"><img ng-src="{{controller.avatar}}" width="14" height="14" /> {{controller.question}}</p>' + '<p><b>Information about patient:</b></p>' + '<p size="10" class="form-control">{{controller.tags}}</p>' + '<p><b>Your reply:</b></p>' + '<div text-angular ta-unsafe-sanitizer="false" ng-model="controller.reply" id="wysiwyg" name="wysiwyg" ta-text-editor-class="border-around" ta-html-editor-class="border-around">' + '</div>' + '<a class="btn btn-default" ng-click="controller.formSubmit()" style="margin-top:20px;">Send</a>' + '</div>' + '</div>';
 
 exports.default = conversationReplyTemplate;
 module.exports = exports['default'];
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var _chatboxconfig = require('./custom_pages/chatboxconfig/chatboxconfig');
@@ -779,6 +819,14 @@ var _replyconfig2 = _interopRequireDefault(_replyconfig);
 var _replytemplate = require('./custom_pages/conversation_reply/replytemplate');
 
 var _replytemplate2 = _interopRequireDefault(_replytemplate);
+
+var _botbuilderController = require('./custom_pages/botbuilder/botbuilderController');
+
+var _botbuilderController2 = _interopRequireDefault(_botbuilderController);
+
+var _index = require('./custom_pages/botbuilder/index');
+
+var _index2 = _interopRequireDefault(_index);
 
 var _stamplay_array_str_field_config = require('./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config');
 
@@ -1106,6 +1154,18 @@ myApp.config(function ($stateProvider) {
     });
 });
 
+// BOTBUILDER PAGE
+
+myApp.config(function ($stateProvider) {
+    $stateProvider.state('botbuilder', {
+        parent: 'main',
+        url: '/botbuilder?/:botId',
+        controller: _botbuilderController2.default,
+        controllerAs: 'controller',
+        template: _index2.default
+    });
+});
+
 /***************************************
  * CUSTOM FIELDS
  * ---- 
@@ -1208,7 +1268,7 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
      * CUSTOM MENU
      ***************************************/
 
-    admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard')).addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;')).addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))).addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
+    admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard')).addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;')).addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu().title('Bot Builder').icon('<span class="glyphicon glyphicon-tower"></span>&nbsp;').link('/botbuilder'))).addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
 
     /***************************************
      * CUSTOM HEADER
@@ -1265,7 +1325,7 @@ myApp.config(['$translateProvider', function ($translateProvider) {
 }]);
 */
 
-},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_fields/obj_key_value/obj_key_value_field_conf":4,"./custom_fields/obj_key_value/obj_key_value_field_directive":5,"./custom_fields/obj_key_value/obj_key_value_field_view":6,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":9,"./custom_pages/chatboxconfig/chatboxconfig":10,"./custom_pages/chatboxconfig/chatboxconfigtemplate":11,"./custom_pages/conversation_reply/replyconfig":12,"./custom_pages/conversation_reply/replytemplate":13,"./models/articles":15,"./models/chatbox":16,"./models/chatroom":17,"./models/chatroomreplies":18,"./models/customization":19,"./models/users":20}],15:[function(require,module,exports){
+},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_fields/obj_key_value/obj_key_value_field_conf":4,"./custom_fields/obj_key_value/obj_key_value_field_directive":5,"./custom_fields/obj_key_value/obj_key_value_field_view":6,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":9,"./custom_pages/botbuilder/botbuilderController":10,"./custom_pages/botbuilder/index":11,"./custom_pages/chatboxconfig/chatboxconfig":12,"./custom_pages/chatboxconfig/chatboxconfigtemplate":13,"./custom_pages/conversation_reply/replyconfig":14,"./custom_pages/conversation_reply/replytemplate":15,"./models/articles":17,"./models/chatbox":18,"./models/chatroom":19,"./models/chatroomreplies":20,"./models/customization":21,"./models/users":22}],17:[function(require,module,exports){
 module.exports = function (nga, articles) {
 
     // LIST VIEW
@@ -1283,7 +1343,7 @@ module.exports = function (nga, articles) {
     return articles;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 module.exports = function (nga, chatbox, customizations, chatroom) {
 
     // LIST VIEW
@@ -1313,7 +1373,7 @@ module.exports = function (nga, chatbox, customizations, chatroom) {
     return chatbox;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports = function (nga, chatroom, chatReplies) {
 
     // DELETION VIEW
@@ -1336,7 +1396,7 @@ module.exports = function (nga, chatroom, chatReplies) {
     return chatroom;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = function (nga, chatroomreplies, chatRoom) {
 
     // LIST VIEW
@@ -1363,7 +1423,7 @@ module.exports = function (nga, chatroomreplies, chatRoom) {
     return chatroomreplies;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = function (nga, customization) {
 
     // LIST VIEW
@@ -1389,7 +1449,7 @@ module.exports = function (nga, customization) {
     return customization;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = function (nga, users) {
 
     // LIST VIEW
@@ -1407,7 +1467,7 @@ module.exports = function (nga, users) {
     return users;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1686,7 +1746,7 @@ var Entity = function () {
 exports.default = Entity;
 module.exports = exports["default"];
 
-},{"../Field/Field":24,"../Utils/stringUtils":28,"../View/BatchDeleteView":29,"../View/CreateView":30,"../View/DashboardView":31,"../View/DeleteView":32,"../View/EditView":33,"../View/ExportView":34,"../View/ListView":35,"../View/MenuView":36,"../View/ShowView":37}],22:[function(require,module,exports){
+},{"../Field/Field":26,"../Utils/stringUtils":30,"../View/BatchDeleteView":31,"../View/CreateView":32,"../View/DashboardView":33,"../View/DeleteView":34,"../View/EditView":35,"../View/ExportView":36,"../View/ListView":37,"../View/MenuView":38,"../View/ShowView":39}],24:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1799,7 +1859,7 @@ var Entry = function () {
 exports.default = Entry;
 module.exports = exports['default'];
 
-},{"./Utils/objectProperties":26}],23:[function(require,module,exports){
+},{"./Utils/objectProperties":28}],25:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1975,7 +2035,7 @@ var EmbeddedListField = function (_Field) {
 exports.default = EmbeddedListField;
 module.exports = exports["default"];
 
-},{"../Entity/Entity":21,"./Field":24}],24:[function(require,module,exports){
+},{"../Entity/Entity":23,"./Field":26}],26:[function(require,module,exports){
 exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -2275,7 +2335,7 @@ var Field = function () {
 exports.default = Field;
 module.exports = exports["default"];
 
-},{"../Utils/stringUtils":28}],25:[function(require,module,exports){
+},{"../Utils/stringUtils":30}],27:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     getReferencedLists: function getReferencedLists(fields) {
@@ -2320,7 +2380,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -2414,7 +2474,7 @@ function cloneAndNest(object) {
     }, {});
 }
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     order: function order(input) {
@@ -2432,7 +2492,7 @@ exports.default = {
 };
 module.exports = exports["default"];
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     /**
@@ -2454,7 +2514,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -2488,7 +2548,7 @@ var BatchDeleteView = function (_View) {
 exports.default = BatchDeleteView;
 module.exports = exports['default'];
 
-},{"./View":38}],30:[function(require,module,exports){
+},{"./View":40}],32:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2630,7 +2690,7 @@ var CreateView = function (_View) {
 exports.default = CreateView;
 module.exports = exports['default'];
 
-},{"./View":38}],31:[function(require,module,exports){
+},{"./View":40}],33:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2673,7 +2733,7 @@ var DashboardView = function (_ListView) {
 exports.default = DashboardView;
 module.exports = exports['default'];
 
-},{"./ListView":35}],32:[function(require,module,exports){
+},{"./ListView":37}],34:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -2707,7 +2767,7 @@ var DeleteView = function (_View) {
 exports.default = DeleteView;
 module.exports = exports['default'];
 
-},{"./View":38}],33:[function(require,module,exports){
+},{"./View":40}],35:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2848,7 +2908,7 @@ var EditView = function (_View) {
 exports.default = EditView;
 module.exports = exports['default'];
 
-},{"./View":38}],34:[function(require,module,exports){
+},{"./View":40}],36:[function(require,module,exports){
 exports.__esModule = true;
 
 var _ListView2 = require('./ListView');
@@ -2882,7 +2942,7 @@ var ExportView = function (_ListView) {
 exports.default = ExportView;
 module.exports = exports['default'];
 
-},{"./ListView":35}],35:[function(require,module,exports){
+},{"./ListView":37}],37:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3149,7 +3209,7 @@ var ListView = function (_View) {
 exports.default = ListView;
 module.exports = exports['default'];
 
-},{"../Utils/orderElement":27,"./View":38}],36:[function(require,module,exports){
+},{"../Utils/orderElement":29,"./View":40}],38:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3207,7 +3267,7 @@ var MenuView = function (_View) {
 exports.default = MenuView;
 module.exports = exports['default'];
 
-},{"./View":38}],37:[function(require,module,exports){
+},{"./View":40}],39:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -3240,7 +3300,7 @@ var ShowView = function (_View) {
 exports.default = ShowView;
 module.exports = exports['default'];
 
-},{"./View":38}],38:[function(require,module,exports){
+},{"./View":40}],40:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3632,7 +3692,7 @@ var View = function () {
 exports.default = View;
 module.exports = exports['default'];
 
-},{"../Entry":22,"../Utils/ReferenceExtractor":25,"../Utils/objectProperties":26}],39:[function(require,module,exports){
+},{"../Entry":24,"../Utils/ReferenceExtractor":27,"../Utils/objectProperties":28}],41:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3745,4 +3805,4 @@ var Entry = function () {
 exports.default = Entry;
 module.exports = exports['default'];
 
-},{"./Utils/objectProperties":26}]},{},[14]);
+},{"./Utils/objectProperties":28}]},{},[16]);

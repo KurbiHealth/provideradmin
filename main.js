@@ -319,6 +319,19 @@ myApp.config(function($stateProvider) {
     });
 });
 
+// BOTBUILDER PAGE
+import botbuilderController from './custom_pages/botbuilder/botbuilderController';
+import botbuilderTemplate from './custom_pages/botbuilder/index';
+myApp.config(function($stateProvider) {
+    $stateProvider.state('botbuilder', {
+        parent: 'main',
+        url: '/botbuilder?/:botId',
+        controller: botbuilderController,
+        controllerAs: 'controller',
+        template: botbuilderTemplate
+    });
+});
+
    
 /***************************************
  * CUSTOM FIELDS
@@ -449,6 +462,7 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
             .addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu().title('Bot Builder').icon('<span class="glyphicon glyphicon-tower"></span>&nbsp;').link('/botbuilder'))
         )
         .addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;'))
     );

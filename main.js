@@ -70,12 +70,12 @@ myApp.config(function(RestangularProvider) {
   
     RestangularProvider.addFullRequestInterceptor(function(element, operation, what, url, 
         headers, params, httpConfig) {
-        console.log('url',angular.copy(url));
+        //console.log('url',angular.copy(url));
         //console.log('element: ',element);
         //console.log('operation: ',operation);
         //console.log('what: ',what);
         //console.log('headers: ',headers);
-        console.log('params: ',params);
+        //console.log('params: ',params);
         //console.log('httpConfig',httpConfig);
 
         /*
@@ -105,7 +105,7 @@ myApp.config(function(RestangularProvider) {
             delete params._sortDir;
         }
 
-        console.log('params post Stamplay processing:',params);
+        //console.log('params post Stamplay processing:',params);
 
         return { element: element, params: params };
     });
@@ -189,7 +189,7 @@ are foreign keys and which are for "where"? */
                     // 'referenced_list' sends the foreign key in config.params._filters
                     // but it should be in config.params for Stamplay
                     if(config.params._filters){
-console.log('about to fix _filters');
+//console.log('about to fix _filters');
                         var obj = config.params._filters;
                         for(var key in obj){
                             where[key] = obj[key];
@@ -205,7 +205,7 @@ console.log('about to fix _filters');
                     }
 
                 }
-console.log('config post interceptor and Stamplay fixes',config);
+//console.log('config post interceptor and Stamplay fixes',config);
                 return config || $q.when(config);
             }
         };
@@ -251,7 +251,7 @@ myApp.config(function(RestangularProvider) {
     RestangularProvider.addResponseInterceptor(function(data,operation,what,url,response,deferred){
 
         var newResponse;
-        console.log('Response',response);
+        //console.log('Response',response);
         //console.log(typeof response.data.data);
         //console.log('Data',data);
 
@@ -381,8 +381,8 @@ myApp.directive('editChatBox', ['$location', function($location){
     return {
         restrict: 'E',
         link: function(scope,ele,attrs){
-console.log('scope',scope);
-console.log('attrs',attrs);
+//console.log('scope',scope);
+//console.log('attrs',attrs);
             scope.editChatBoxUrl = scope.entry ? scope.entry._identifierValue : '';
             scope.size = attrs.size;
             scope.type = attrs.type ? attrs.type : '';

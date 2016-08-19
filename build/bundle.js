@@ -915,12 +915,12 @@ myApp.config(function (RestangularProvider) {
     });
 
     RestangularProvider.addFullRequestInterceptor(function (element, operation, what, url, headers, params, httpConfig) {
-        console.log('url', angular.copy(url));
+        //console.log('url',angular.copy(url));
         //console.log('element: ',element);
         //console.log('operation: ',operation);
         //console.log('what: ',what);
         //console.log('headers: ',headers);
-        console.log('params: ', params);
+        //console.log('params: ',params);
         //console.log('httpConfig',httpConfig);
 
         /*
@@ -950,7 +950,7 @@ myApp.config(function (RestangularProvider) {
             delete params._sortDir;
         }
 
-        console.log('params post Stamplay processing:', params);
+        //console.log('params post Stamplay processing:',params);
 
         return { element: element, params: params };
     });
@@ -1031,7 +1031,7 @@ myApp.config(function ($httpProvider) {
                     // 'referenced_list' sends the foreign key in config.params._filters
                     // but it should be in config.params for Stamplay
                     if (config.params._filters) {
-                        console.log('about to fix _filters');
+                        //console.log('about to fix _filters');
                         var obj = config.params._filters;
                         for (var key in obj) {
                             where[key] = obj[key];
@@ -1046,7 +1046,7 @@ myApp.config(function ($httpProvider) {
                         delete config.params._filters;
                     }
                 }
-                console.log('config post interceptor and Stamplay fixes', config);
+                //console.log('config post interceptor and Stamplay fixes',config);
                 return config || $q.when(config);
             }
         };
@@ -1091,7 +1091,7 @@ myApp.config(function (RestangularProvider) {
     RestangularProvider.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
 
         var newResponse;
-        console.log('Response', response);
+        //console.log('Response',response);
         //console.log(typeof response.data.data);
         //console.log('Data',data);
 
@@ -1210,8 +1210,8 @@ myApp.directive('editChatBox', ['$location', function ($location) {
     return {
         restrict: 'E',
         link: function link(scope, ele, attrs) {
-            console.log('scope', scope);
-            console.log('attrs', attrs);
+            //console.log('scope',scope);
+            //console.log('attrs',attrs);
             scope.editChatBoxUrl = scope.entry ? scope.entry._identifierValue : '';
             scope.size = attrs.size;
             scope.type = attrs.type ? attrs.type : '';
@@ -1380,7 +1380,7 @@ module.exports = function (nga, chatroom, chatReplies) {
     chatroom.deletionView().disable();
 
     // LIST VIEW
-    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"back pain details"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show']).batchActions([]).filters([nga.field('dt_create').label('Created'), nga.field('messages')]);
+    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"get duration"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show']).batchActions([]).filters([nga.field('dt_create').label('Created'), nga.field('messages')]);
 
     // SHOW VIEW
     chatroom.showView().fields([nga.field('owner'), nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy, HH:mm:ss'), nga.field('dt_update', 'datetime').label('Last Updated').format('MM/dd/yyyy, HH:mm:ss')

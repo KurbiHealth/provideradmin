@@ -397,7 +397,7 @@ app.AppView = Backbone.View.extend({
             width: 800,
             height: 600,
             gridSize: 1,
-            snapLinks: { radius: 75 },
+            snapLinks: { radius: 5 }, // 75
             validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
                 // Prevent linking from input ports.
                 if (magnetS && magnetS.getAttribute('type') === 'input') return false;

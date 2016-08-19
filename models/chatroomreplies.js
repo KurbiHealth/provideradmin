@@ -39,7 +39,7 @@ module.exports = function(nga,chatroomreplies,chatRoom) {
             .label('Last Updated')
         ,nga.field('chatRoomId')
             .label('Reply Id')
-        ,nga.field('recipient')
+        //,nga.field('recipient')
         ,nga.field('replyText','wysiwyg')
     ])
     .title('Reply Detail')
@@ -47,8 +47,8 @@ module.exports = function(nga,chatroomreplies,chatRoom) {
     // CREATION VIEW
     chatroomreplies.creationView()
     .fields([
-        nga.field('recipient')
-        ,nga.field('replyText','wysiwyg')
+        //nga.field('recipient')
+        nga.field('replyText','wysiwyg')
     ])
     .title('Create New Reply')
 

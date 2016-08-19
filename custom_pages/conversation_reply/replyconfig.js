@@ -6,7 +6,7 @@ function processChatroomRecord(data){
 		OR ADD A FUNCTION TO THE CHATBOT TO CREATE A USER RECORD WHEN IT SAVES THE CHATBOT???? */
 
 	var messages = data[0].messages;
-
+console.log('messages',messages);
 	var question,
 		avatar,
 		created;
@@ -17,19 +17,19 @@ function processChatroomRecord(data){
 			var q = m.message.qCode;
 			var b = m.message.body;
 			if(q){
-				if(q == 'avatar chosen'){
+				if(q == 'get symptom'){
 					avatar = b.image;
 				}
-				if(q == 'back pain details'){
+				if(q == 'ask for email'){
 					question = b.text;
 				}else{
-					if(q.includes('pain')){
+					if(q.includes('get duration')){
 						tags.push(b.text);
 					}
-					if(q.includes('one week') || q.includes('one day')){
+					if(q.includes('get treatment') || q.includes('one day')){
 						tags.push(b.text);
 					}
-					if(q.includes('asked pros') || q.includes('self care') || q.includes('no treatment')){
+					if(q.includes('user summary') || q.includes('self care') || q.includes('no treatment')){
 						if(tags.indexOf(b.text) == -1)
 							tags.push(b.text);
 					}

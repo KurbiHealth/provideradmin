@@ -12,7 +12,7 @@ module.exports = function(nga,chatroom,chatReplies) {
             .format('MM/dd/yyyy'),
         nga.field('messages','obj_key_value_field')
             .label('Question')
-            .keyValueChoices('{"qCode":"get duration"}')
+            .keyValueChoices('{"qCode":"ask for email"}')
             .cssClasses(['obj_key_value_field'])
     ])
     .title('Conversations')

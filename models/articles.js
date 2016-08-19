@@ -30,7 +30,7 @@ module.exports = function(nga,articles) {
         ,nga.field('conversation_id')
         ,nga.field('published','boolean')
             .choices([
-              { value: null, label: 'null' },
+              //{ value: null, label: 'null' },
               { value: true, label: 'yes' },
               { value: false, label: 'no' }
           ])
@@ -43,7 +43,7 @@ module.exports = function(nga,articles) {
         ,nga.field('body','wysiwyg')
         ,nga.field('published','boolean')
             .choices([
-              { value: null, label: 'null' },
+              //{ value: null, label: 'null' },
               { value: true, label: 'yes' },
               { value: false, label: 'no' }
           ])

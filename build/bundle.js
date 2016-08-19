@@ -632,7 +632,7 @@ function processChatroomRecord(data) {
  	OR ADD A FUNCTION TO THE CHATBOT TO CREATE A USER RECORD WHEN IT SAVES THE CHATBOT???? */
 
 	var messages = data[0].messages;
-
+	console.log('messages', messages);
 	var question, avatar, created;
 	var tags = [];
 	messages.map(function (m) {
@@ -641,19 +641,19 @@ function processChatroomRecord(data) {
 			var q = m.message.qCode;
 			var b = m.message.body;
 			if (q) {
-				if (q == 'avatar chosen') {
+				if (q == 'get symptom') {
 					avatar = b.image;
 				}
-				if (q == 'back pain details') {
+				if (q == 'ask for email') {
 					question = b.text;
 				} else {
-					if (q.includes('pain')) {
+					if (q.includes('get duration')) {
 						tags.push(b.text);
 					}
-					if (q.includes('one week') || q.includes('one day')) {
+					if (q.includes('get treatment') || q.includes('one day')) {
 						tags.push(b.text);
 					}
-					if (q.includes('asked pros') || q.includes('self care') || q.includes('no treatment')) {
+					if (q.includes('user summary') || q.includes('self care') || q.includes('no treatment')) {
 						if (tags.indexOf(b.text) == -1) tags.push(b.text);
 					}
 				}
@@ -796,7 +796,7 @@ module.exports = exports['default'];
 
 },{}],15:[function(require,module,exports){
 exports.__esModule = true;
-var conversationReplyTemplate = '<style>input{margin-bottom:10px;}.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;' + '-ms-word-break: break-all;word-break: break-all;word-break: break-word;}.ta-editor{border: 1px solid gray;border-radius:5px;}</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Reply To A Question</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-12">' + '<h4>From a potential patient...</h4>' + '<p><b>Question:</b></p>' + '<p size="10" class="form-control"><img ng-src="{{controller.avatar}}" width="14" height="14" /> {{controller.question}}</p>' + '<p><b>Information about patient:</b></p>' + '<p size="10" class="form-control">{{controller.tags}}</p>' + '<p><b>Your reply:</b></p>' + '<div text-angular ta-unsafe-sanitizer="false" ng-model="controller.reply" id="wysiwyg" name="wysiwyg" ta-text-editor-class="border-around" ta-html-editor-class="border-around">' + '</div>' + '<a class="btn btn-default" ng-click="controller.formSubmit()" style="margin-top:20px;">Send</a>' + '</div>' + '</div>';
+var conversationReplyTemplate = '<style>input{margin-bottom:10px;}.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;' + '-ms-word-break: break-all;word-break: break-all;word-break: break-word;}.ta-editor{border: 1px solid gray;border-radius:5px;}</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Reply To A Question</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-12">' + '<h4>From a potential patient...</h4>' + '<p><b>Question:</b></p>' + '<p size="10" class="form-control" style="min-height:34px !important;height:inherit;"><img ng-src="{{controller.avatar}}" width="14" height="14" /> {{controller.question}}</p>' + '<p><b>Information about patient:</b></p>' + '<p size="10" class="form-control">{{controller.tags}}</p>' + '<p><b>Your reply:</b></p>' + '<div text-angular ta-unsafe-sanitizer="false" ng-model="controller.reply" id="wysiwyg" name="wysiwyg" ta-text-editor-class="border-around" ta-html-editor-class="border-around">' + '</div>' + '<a class="btn btn-default" ng-click="controller.formSubmit()" style="margin-top:20px;">Send</a>' + '</div>' + '</div>';
 
 exports.default = conversationReplyTemplate;
 module.exports = exports['default'];
@@ -1336,10 +1336,14 @@ module.exports = function (nga, articles) {
     articles.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('author'), nga.field('title'), nga.field('published', 'boolean').choices([{ value: null, label: 'null' }, { value: true, label: 'yes' }, { value: false, label: 'no' }])]).listActions(['show', 'edit', 'delete']);
 
     // SHOW VIEW
-    articles.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('author'), nga.field('title'), nga.field('body', 'wysiwyg'), nga.field('conversation_id'), nga.field('published', 'boolean').choices([{ value: null, label: 'null' }, { value: true, label: 'yes' }, { value: false, label: 'no' }])]);
+    articles.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('author'), nga.field('title'), nga.field('body', 'wysiwyg'), nga.field('conversation_id'), nga.field('published', 'boolean').choices([
+    //{ value: null, label: 'null' },
+    { value: true, label: 'yes' }, { value: false, label: 'no' }])]);
 
     // CREATION VIEW
-    articles.creationView().fields([nga.field('title'), nga.field('body', 'wysiwyg'), nga.field('published', 'boolean').choices([{ value: null, label: 'null' }, { value: true, label: 'yes' }, { value: false, label: 'no' }])]);
+    articles.creationView().fields([nga.field('title'), nga.field('body', 'wysiwyg'), nga.field('published', 'boolean').choices([
+    //{ value: null, label: 'null' },
+    { value: true, label: 'yes' }, { value: false, label: 'no' }])]);
 
     // EDITION VIEW
     articles.editionView().fields(articles.creationView().fields());
@@ -1384,7 +1388,7 @@ module.exports = function (nga, chatroom, chatReplies) {
     chatroom.deletionView().disable();
 
     // LIST VIEW
-    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"get duration"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show']).batchActions([]).filters([nga.field('dt_create').label('Created'), nga.field('messages')]);
+    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"ask for email"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show']).batchActions([]).filters([nga.field('dt_create').label('Created'), nga.field('messages')]);
 
     // SHOW VIEW
     chatroom.showView().fields([nga.field('owner'), nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy, HH:mm:ss'), nga.field('dt_update', 'datetime').label('Last Updated').format('MM/dd/yyyy, HH:mm:ss')
@@ -1414,10 +1418,14 @@ module.exports = function (nga, chatroomreplies, chatRoom) {
     nga.field('replyText').label('Search Replies').pinned(true).template('<div class="input-group"><input type="text" ng-model="value" placeholder="Search" class="form-control"></input><span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span></div>')]);
 
     // SHOW VIEW
-    chatroomreplies.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('chatRoomId').label('Reply Id'), nga.field('recipient'), nga.field('replyText', 'wysiwyg')]).title('Reply Detail');
+    chatroomreplies.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('chatRoomId').label('Reply Id')
+    //,nga.field('recipient')
+    , nga.field('replyText', 'wysiwyg')]).title('Reply Detail');
 
     // CREATION VIEW
-    chatroomreplies.creationView().fields([nga.field('recipient'), nga.field('replyText', 'wysiwyg')]).title('Create New Reply');
+    chatroomreplies.creationView().fields([
+    //nga.field('recipient')
+    nga.field('replyText', 'wysiwyg')]).title('Create New Reply');
 
     // EDITION VIEW
     chatroomreplies.editionView().fields(chatroomreplies.creationView().fields()).title('Edit Reply');

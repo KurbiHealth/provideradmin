@@ -12,7 +12,7 @@ var conversationReplyTemplate =
     '<div class="col-lg-12">' +
     '<h4>From a potential patient...</h4>' +
     	'<p><b>Question:</b></p>' +
-        '<p size="10" class="form-control"><img ng-src="{{controller.avatar}}" width="14" height="14" /> {{controller.question}}</p>' + 
+        '<p size="10" class="form-control" style="min-height:34px !important;height:inherit;"><img ng-src="{{controller.avatar}}" width="14" height="14" /> {{controller.question}}</p>' + 
         '<p><b>Information about patient:</b></p>' +
         '<p size="10" class="form-control">{{controller.tags}}</p>' + 
         '<p><b>Your reply:</b></p>' +

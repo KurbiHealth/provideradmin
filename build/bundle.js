@@ -86,7 +86,7 @@ exports.default = function (nga, admin, replies) {
     return nga.dashboard()
     // THIS IS A SAMPLE COLLECTION
     // taken from https://github.com/marmelab/ng-admin-demo/blob/gh-pages/js/dashboard/config.js
-    .addCollection(nga.collection(admin.getEntity('chatroom')).name('pending_conversations').title('20 Most Recent Bot Conversations').fields([nga.field('dt_create', 'datetime').format('short').isDetailLink(true), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"back pain details"}').cssClasses(['obj_key_value_field'])])
+    .addCollection(nga.collection(admin.getEntity('chatroom')).name('pending_conversations').title('20 Most Recent Bot Conversations').fields([nga.field('dt_create', 'datetime').format('short').isDetailLink(true), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"get duration"}').cssClasses(['obj_key_value_field'])])
     //.permanentFilters({ rep: true })
     .sortField('dt_create').sortDir('DESC').perPage(20)).template('\n<div class="row">\n    <div class="col-lg-12">\n        <div class="page-header">\n            <h1>Dashboard</h1>\n        </div>\n    </div>\n</div>\n<div class="row dashboard-starter"></div>\n<dashboard-summary></dashboard-summary>\n<div class="row dashboard-content">\n    <div class="col-lg-12">\n        <div class="panel panel-default">\n            <ma-dashboard-panel collection="dashboardController.collections.pending_conversations" entries="dashboardController.entries.pending_conversations" datastore="dashboardController.datastore"></ma-dashboard-panel>\n        </div>\n    </div>\n</div>\n');
 };

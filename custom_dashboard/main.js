@@ -12,7 +12,7 @@ export default function (nga, admin, replies) {
                     .isDetailLink(true),
                 nga.field('messages','obj_key_value_field')
                     .label('Question')
-                    .keyValueChoices('{"qCode":"back pain details"}')
+                    .keyValueChoices('{"qCode":"get duration"}')
                     .cssClasses(['obj_key_value_field']),
             ])
             //.permanentFilters({ rep: true })

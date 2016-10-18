@@ -1,8 +1,8 @@
 module.exports = function(nga,chatroom,chatReplies) {
 
     // DELETION VIEW
-    chatroom.deletionView()
-    .disable()
+// chatroom.deletionView()
+// .disable()
 
     // LIST VIEW
     chatroom.listView()
@@ -16,8 +16,8 @@ module.exports = function(nga,chatroom,chatReplies) {
             .cssClasses(['obj_key_value_field'])
     ])
     .title('Conversations')
-    .listActions(['show'])
-    .batchActions([])
+    .listActions(['show','delete'])
+    //.batchActions([])
     .filters([
         nga.field('dt_create')
             .label('Created'),
@@ -27,16 +27,13 @@ module.exports = function(nga,chatroom,chatReplies) {
     // SHOW VIEW
     chatroom.showView()
     .fields([
-        nga.field('owner')
+        nga.field('user_owner')
         ,nga.field('dt_create','datetime')
             .label('Created')
             .format('MM/dd/yyyy, HH:mm:ss')
         ,nga.field('dt_update','datetime')
             .label('Last Updated')
             .format('MM/dd/yyyy, HH:mm:ss')
-        // ,nga.field('key')
-        // ,nga.field('room')
-        // ,nga.field('sessionID')
         ,nga.field('messages','stamplay_array_str')
             .label('Conversation Details')
             .targetFields([

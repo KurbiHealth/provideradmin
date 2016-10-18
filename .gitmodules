@@ -1,0 +1,3 @@
+[submodule "globalNgadminCode"]
+	path = globalNgadminCode
+	url = https://github.com/KurbiHealth/globalNgadminCode.git

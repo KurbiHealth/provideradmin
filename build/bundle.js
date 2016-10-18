@@ -138,7 +138,7 @@ var ObjKeyValueFieldConf = function (_Field) {
 exports.default = ObjKeyValueFieldConf;
 module.exports = exports["default"];
 
-},{"admin-config/lib/Field/Field":26}],5:[function(require,module,exports){
+},{"admin-config/lib/Field/Field":29}],5:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = ObjKeyValueFieldDirective;
 function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
@@ -345,7 +345,7 @@ exports.default = stamplayArrayOfStrings;
 stamplayArrayOfStrings.$inject = ['NgAdminConfiguration'];
 module.exports = exports['default'];
 
-},{"admin-config/lib/entry":41}],8:[function(require,module,exports){
+},{"admin-config/lib/entry":44}],8:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -405,7 +405,7 @@ var StamplayArrayStrField = function (_EmbeddedListField) {
 exports.default = StamplayArrayStrField;
 module.exports = exports["default"];
 
-},{"admin-config/lib/Field/EmbeddedListField":25}],9:[function(require,module,exports){
+},{"admin-config/lib/Field/EmbeddedListField":28}],9:[function(require,module,exports){
 exports.__esModule = true;
 /*
 getReadWidget:   DISPLAYED IN listView AND showView
@@ -802,8 +802,314 @@ exports.default = conversationReplyTemplate;
 module.exports = exports['default'];
 
 },{}],16:[function(require,module,exports){
+module.exports = function (admin) {
+
+    // Experimental Error Handler
+    function appErrorHandler(response) {
+        console.log('in globalNgadminCode/errorHandlers/adminErrorHandler.js');
+        return 'Global error: ' + response.status + '(' + response.data + ')';
+    }
+    admin.errorMessage(appErrorHandler);
+
+    return admin;
+};
+
+},{}],17:[function(require,module,exports){
+module.exports = function (myApp) {
+
+	/***************************************
+  * RESTANGULAR ERROR HANDLER (API CALLS)
+  ***************************************/
+
+	/*myApp.config(function(RestangularProvider) {
+ 	    var refreshAccesstoken = function() {
+         var deferred = $q.defer();
+ 	        // Refresh access-token logic
+ 	        return deferred.promise;
+     };
+ 	    Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
+         if(response.status === 403) {
+             refreshAccesstoken().then(function() {
+                 // Repeat the request and then call the handlers the usual way.
+                 $http(response.config).then(responseHandler, deferred.reject);
+                 // Be aware that no request interceptors are called this way.
+             });
+ 	            return false; // error handled
+         }
+ 	        return true; // error not handled
+     });
+ });*/
+
+	/***************************************
+  * CUSTOM ERROR MESSAGES
+  ***************************************/
+
+	// app.errorMessage(function (response) {
+	//     return 'Global error: ' + response.status + '(' + response.data + ')';
+	// });
+
+	function errorHandler($rootScope, $state, $translate, notification) {
+		$rootScope.$on("$stateChangeError", function handleError(event, toState, toParams, fromState, fromParams, error) {
+			console.log('error', error);
+			// console.log('event',event);
+			// console.log('toState',toState);
+			// console.log('toParams',toParams);
+			if (error.status == 404) {
+				$state.go('ma-404');
+				event.preventDefault();
+			} else {
+				$translate('STATE_CHANGE_ERROR', { message: error.message }).then(function (text) {
+					return notification.log(text, { addnCls: 'humane-flatty-error' });
+				});
+				throw error;
+			}
+		});
+	}
+
+	myApp.run(errorHandler);
+
+	myApp.config(['$translateProvider', function ($translateProvider) {
+		$translateProvider.translations('en', {
+			'STATE_CHANGE_ERROR': 'Error: {{ message }}'
+		});
+		//$translateProvider.preferredLanguage('en');
+	}]);
+
+	return myApp;
+};
+
+},{}],18:[function(require,module,exports){
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
+module.exports = function (myApp) {
+
+	/***************************************
+  * RESTANGULAR INTERCEPTOR FUNCTIONS
+  ***************************************/
+
+	myApp.config(function (RestangularProvider) {
+
+		var token = window.localStorage.getItem("http://kpadmin-jwt");
+		if ((typeof token === 'undefined' ? 'undefined' : _typeof(token)) == 'object' && token == null) {
+			token = '';
+		} else {
+			token = token.replace(/"/g, '');
+			token = token.toString();
+		}
+
+		RestangularProvider.setDefaultHeaders({
+			"Content-Type": 'application/json; charset=utf-8',
+			"x-stamplay-jwt": token
+		});
+
+		RestangularProvider.addFullRequestInterceptor(function (element, operation, what, url, headers, params, httpConfig) {
+			//console.log('url',angular.copy(url));
+			//console.log('element: ',element);
+			//console.log('operation: ',operation);
+			//console.log('what: ',what);
+			//console.log('headers: ',headers);
+			//console.log('params: ',params);
+			//console.log('httpConfig',httpConfig);
+
+			/*
+    * FIX ISSUES FOR STAMPLAY API
+    */
+
+			if (operation == 'getList') {
+				// FIX PAGINATION
+				// STAMPLAY CANONICAL URL IS:
+				// https://bkschool.stamplayapp.com/api/cobject/v1/audio
+				//                  ? n=10 & sort=audio_url & page=1 & per_page=10
+
+				if (!params.page) {
+					params.page = params._page;
+				}
+				if (!params.per_page) {
+					params.per_page = params._perPage;
+				}
+				if (params._sortField) {
+					params.sort = '';
+					if (params._sortDir == 'DESC') params.sort = '-';
+					params.sort += params._sortField;
+				}
+				delete params._page;
+				delete params._perPage;
+				delete params._sortField;
+				delete params._sortDir;
+			}
+
+			//console.log('params post Stamplay processing:',params);
+
+			return { element: element, params: params };
+		});
+	});
+
+	/***************************************
+  * POST-RESTANGULAR INTERCEPTOR FUNCTIONS
+  ***************************************/
+
+	myApp.config(function ($httpProvider) {
+
+		// USING 'unshift' TO RUN THESE FUNCTIONS FIRST!!!!
+		$httpProvider.interceptors.unshift(addContentTypeToHeader);
+
+		// these functions run in regular order (after Restangular interceptors)
+		$httpProvider.interceptors.push(fixStamplayIssues);
+
+		// **************************************************************************
+
+		/*
+   * FIX ISSUES FOR STAMPLAY API
+   */
+
+		// Angular removes the header 'Content-Type' if request is GET.
+		// This function is a hack to add the header back in, because Stamplay
+		// requires the header.
+		function addContentTypeToHeader() {
+			return {
+				request: requestInterceptor
+			};
+
+			function requestInterceptor(config) {
+				if (angular.isDefined(config.headers['Content-Type']) && !angular.isDefined(config.data)) config.data = '';
+
+				return config;
+			}
+		}
+
+		function fixStamplayIssues($q) {
+			return {
+				request: function request(config) {
+					config = angular.copy(config);
+
+					// When NG-Admin does a list GET, it receives all fields for
+					// that data model, and those fields persist in the dataStore,
+					// even if the editionView only defines a couple of fields.
+					// Which means that the un-editable fields in Stamplay must be
+					// removed before doing a PUT
+					if (config.method === 'PUT') {
+						delete config.data.__v;
+						delete config.data._id;
+						delete config.data.appId;
+						delete config.data.cobjectId;
+						delete config.data.dt_create;
+						delete config.data.dt_update;
+						delete config.data.id;
+						delete config.data.actions;
+					}
+
+					// translate NGA filter(s) to Stamplay format
+					if (config.method == 'GET' && config.params) {
+						config.params.where = {};
+						var where = config.params.where;
+
+						// hack to fix an NGA problem: when using 'referenced_list',
+						// [object Object] appears in url
+						if (config.params._filters && '[object Object]' in config.params._filters) {
+							var temp = config.params._filters['[object Object]'];
+							delete config.params._filters['[object Object]'];
+							where.chatRoomId = temp; // Stamplay uses a straight key:value pair in GET
+						}
+
+						// 'referenced_list' sends the foreign key in config.params._filters
+						// but it should be in config.params for Stamplay
+						if (config.params._filters) {
+							var obj = config.params._filters;
+							for (var key in obj) {
+								//where[key] = obj[key];
+								//where[key] = {"$regex": '/' + obj[key] + '/'};
+								if (key == 'dt_create' || key == 'dt_modify') {
+									where[key] = { "$gte": obj[key] };
+									//where[key] = new Date(obj[key]);
+								} else {
+										where[key] = { "$regex": '/' + obj[key] + '/' };
+									}
+								delete config.params._filters[key];
+							}
+						}
+						console.log('where', where);
+						// if all the previous fixes have emptied the NGA filter object,
+						// then delete it
+						if (isEmpty(config.params._filters)) {
+							delete config.params._filters;
+						}
+					}
+
+					return config || $q.when(config);
+				}
+			};
+		}
+
+		// from http://stackoverflow.com/questions/4994201/is-object-empty
+		// Speed up calls to hasOwnProperty
+		var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+		function isEmpty(obj) {
+
+			// null and undefined are "empty"
+			if (obj == null) return true;
+
+			// Assume if it has a length property with a non-zero value
+			// that that property is correct.
+			if (obj.length > 0) return false;
+			if (obj.length === 0) return true;
+
+			// If it isn't an object at this point
+			// it is empty, but it can't be anything *but* empty
+			// Is it empty?  Depends on your application.
+			if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== "object") return true;
+
+			// Otherwise, does it have any properties of its own?
+			// Note that this doesn't handle
+			// toString and valueOf enumeration bugs in IE < 9
+			for (var key in obj) {
+				if (hasOwnProperty.call(obj, key)) return false;
+			}
+
+			return true;
+		}
+	});
+
+	/********************************************
+  * RESTANGULAR response INTERCEPTOR FUNCTIONS
+  ********************************************/
+
+	myApp.config(function (RestangularProvider) {
+
+		RestangularProvider.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
+
+			var newResponse;
+			//console.log('Response',response);
+			//console.log(typeof response.data.data);
+			//console.log('Data',data);
+
+			// ADJUST STAMPLAY'S STRUCTURE TO MATCH WHAT NG-ADMIN EXPECTS
+			if ('data' in response.data) {
+				var newData = response.data.data;
+				if (newData.length > 0) {
+					newResponse = response.data.data;
+				} else {
+					newResponse = [];
+				}
+			} else {
+				newResponse = response.data;
+			}
+
+			// FIX PAGINATION
+			if (operation == "getList") {
+				var contentRange = data.pagination.total_elements;
+				//console.log('num of entries retrieved by Restangular',contentRange);
+				response.totalCount = contentRange;
+			}
+
+			return newResponse;
+		});
+	});
+
+	return myApp;
+};
+
+},{}],19:[function(require,module,exports){
 var _chatboxconfig = require('./custom_pages/chatboxconfig/chatboxconfig');
 
 var _chatboxconfig2 = _interopRequireDefault(_chatboxconfig);
@@ -858,7 +1164,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * INITIALIZE THE APPLICATION
  ***************************************/
 
-var myApp = angular.module('myApp', ['ng-admin', 'ngSanitize', "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.controls", "info.vietnamcode.nampnq.videogular.plugins.youtube", "color.picker"]);
+var myApp = angular.module('myApp', ['ng-admin', 'ngSanitize', "com.2fdevs.videogular", "com.2fdevs.videogular.plugins.controls", "info.vietnamcode.nampnq.videogular.plugins.youtube", "pascalprecht.translate", "color.picker"]);
 
 // custom controllers
 myApp.controller('username', ['$scope', '$window', function ($scope, $window) {
@@ -867,256 +1173,18 @@ myApp.controller('username', ['$scope', '$window', function ($scope, $window) {
 }]);
 
 /***************************************
- * RESTANGULAR ERROR HANDLER (API CALLS)
+ * GLOBAL INTERCEPTOR FUNCTIONS
  ***************************************/
 
-/*myApp.config(function(RestangularProvider) {
-
-    var refreshAccesstoken = function() {
-        var deferred = $q.defer();
-
-        // Refresh access-token logic
-
-        return deferred.promise;
-    };
-
-    Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
-        if(response.status === 403) {
-            refreshAccesstoken().then(function() {
-                // Repeat the request and then call the handlers the usual way.
-                $http(response.config).then(responseHandler, deferred.reject);
-                // Be aware that no request interceptors are called this way.
-            });
-
-            return false; // error handled
-        }
-
-        return true; // error not handled
-    });
-});*/
+var interceptorFunctions = require('./globalNgadminCode/interceptors/stamplay');
+interceptorFunctions(myApp);
 
 /***************************************
- * RESTANGULAR INTERCEPTOR FUNCTIONS
+ * GLOBAL ERROR HANDLERS
  ***************************************/
 
-myApp.config(function (RestangularProvider) {
-
-    var token = window.localStorage.getItem("http://kpadmin-jwt");
-    if ((typeof token === 'undefined' ? 'undefined' : _typeof(token)) == 'object' && token == null) {
-        token = '';
-    } else {
-        token = token.replace(/"/g, '');
-        token = token.toString();
-    }
-
-    RestangularProvider.setDefaultHeaders({
-        "Content-Type": 'application/json; charset=utf-8',
-        "x-stamplay-jwt": token
-    });
-
-    RestangularProvider.addFullRequestInterceptor(function (element, operation, what, url, headers, params, httpConfig) {
-        //console.log('url',angular.copy(url));
-        //console.log('element: ',element);
-        //console.log('operation: ',operation);
-        //console.log('what: ',what);
-        //console.log('headers: ',headers);
-        //console.log('params: ',params);
-        //console.log('httpConfig',httpConfig);
-
-        /*
-         * FIX ISSUES FOR STAMPLAY API
-         */
-
-        if (operation == 'getList') {
-            // FIX PAGINATION
-            // STAMPLAY CANONICAL URL IS:
-            // https://bkschool.stamplayapp.com/api/cobject/v1/audio
-            //                  ? n=10 & sort=audio_url & page=1 & per_page=10
-
-            if (!params.page) {
-                params.page = params._page;
-            }
-            if (!params.per_page) {
-                params.per_page = params._perPage;
-            }
-            if (params._sortField) {
-                params.sort = '';
-                if (params._sortDir == 'DESC') params.sort = '-';
-                params.sort += params._sortField;
-            }
-            delete params._page;
-            delete params._perPage;
-            delete params._sortField;
-            delete params._sortDir;
-        }
-
-        //console.log('params post Stamplay processing:',params);
-
-        return { element: element, params: params };
-    });
-});
-
-/***************************************
- * POST-RESTANGULAR INTERCEPTOR FUNCTIONS
- ***************************************/
-
-myApp.config(function ($httpProvider) {
-
-    // USING 'unshift' TO RUN THESE FUNCTIONS FIRST!!!!
-    $httpProvider.interceptors.unshift(addContentTypeToHeader);
-
-    // these functions run in regular order (after Restangular interceptors)
-    $httpProvider.interceptors.push(fixStamplayIssues);
-
-    // **************************************************************************
-
-    /*
-     * FIX ISSUES FOR STAMPLAY API
-     */
-
-    // Angular removes the header 'Content-Type' if request is GET.
-    // This function is a hack to add the header back in, because Stamplay
-    // requires the header.
-    function addContentTypeToHeader() {
-        return {
-            request: requestInterceptor
-        };
-
-        function requestInterceptor(config) {
-            if (angular.isDefined(config.headers['Content-Type']) && !angular.isDefined(config.data)) config.data = '';
-
-            return config;
-        }
-    }
-
-    function fixStamplayIssues($q) {
-        return {
-            request: function request(config) {
-                config = angular.copy(config);
-
-                // When NG-Admin does a list GET, it receives all fields for
-                // that data model, and those fields persist in the dataStore,
-                // even if the editionView only defines a couple of fields.
-                // Which means that the un-editable fields in Stamplay must be
-                // removed before doing a PUT
-                if (config.method === 'PUT') {
-                    delete config.data.__v;
-                    delete config.data._id;
-                    delete config.data.appId;
-                    delete config.data.cobjectId;
-                    delete config.data.dt_create;
-                    delete config.data.dt_update;
-                    delete config.data.id;
-                    delete config.data.actions;
-                }
-
-                // translate NGA filter(s) to Stamplay format
-                if (config.method == 'GET' && config.params) {
-                    config.params.where = {};
-                    var where = config.params.where;
-
-                    // hack to fix an NGA problem: when using 'referenced_list',
-                    // [object Object] appears in url
-                    if (config.params._filters && '[object Object]' in config.params._filters) {
-                        var temp = config.params._filters['[object Object]'];
-                        delete config.params._filters['[object Object]'];
-                        where.chatRoomId = temp; // Stamplay uses a straight key:value pair in GET
-                    }
-                    // PROBLEM
-                    /* NGA sends related lists as a field:key value in _filter. Stamplay
-                    accepts ?field=value for search in related object. However, Stamplay queries
-                    are expected to be part of ?where={}. So how do I know which _filter values
-                    are foreign keys and which are for "where"? */
-
-                    // 'referenced_list' sends the foreign key in config.params._filters
-                    // but it should be in config.params for Stamplay
-                    if (config.params._filters) {
-                        //console.log('about to fix _filters');
-                        var obj = config.params._filters;
-                        for (var key in obj) {
-                            where[key] = obj[key];
-                            //where[key] = {"$regex": '/' + obj[key] + '/'};
-                            delete config.params._filters[key];
-                        }
-                    }
-
-                    // if all the previous fixes have emptied the NGA filter object,
-                    // then delete it
-                    if (isEmpty(config.params._filters)) {
-                        delete config.params._filters;
-                    }
-                }
-                //console.log('config post interceptor and Stamplay fixes',config);
-                return config || $q.when(config);
-            }
-        };
-    }
-
-    // from http://stackoverflow.com/questions/4994201/is-object-empty
-    // Speed up calls to hasOwnProperty
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-    function isEmpty(obj) {
-
-        // null and undefined are "empty"
-        if (obj == null) return true;
-
-        // Assume if it has a length property with a non-zero value
-        // that that property is correct.
-        if (obj.length > 0) return false;
-        if (obj.length === 0) return true;
-
-        // If it isn't an object at this point
-        // it is empty, but it can't be anything *but* empty
-        // Is it empty?  Depends on your application.
-        if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== "object") return true;
-
-        // Otherwise, does it have any properties of its own?
-        // Note that this doesn't handle
-        // toString and valueOf enumeration bugs in IE < 9
-        for (var key in obj) {
-            if (hasOwnProperty.call(obj, key)) return false;
-        }
-
-        return true;
-    }
-});
-
-/********************************************
- * RESTANGULAR response INTERCEPTOR FUNCTIONS
- ********************************************/
-
-myApp.config(function (RestangularProvider) {
-
-    RestangularProvider.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
-
-        var newResponse;
-        //console.log('Response',response);
-        //console.log(typeof response.data.data);
-        //console.log('Data',data);
-
-        // ADJUST STAMPLAY'S STRUCTURE TO MATCH WHAT NG-ADMIN EXPECTS
-        if ('data' in response.data) {
-            var newData = response.data.data;
-            if (newData.length > 0) {
-                newResponse = response.data.data;
-            } else {
-                newResponse = [];
-            }
-        } else {
-            newResponse = response.data;
-        }
-
-        // FIX PAGINATION
-        if (operation == "getList") {
-            var contentRange = data.pagination.total_elements;
-            //console.log('num of entries retrieved by Restangular',contentRange);
-            response.totalCount = contentRange;
-        }
-
-        return newResponse;
-    });
-});
+var errorHandlers = require('./globalNgadminCode/errorHandlers/appLevelErrorHandlers');
+errorHandlers(myApp);
 
 /***************************************
  * CUSTOM PAGES
@@ -1223,7 +1291,7 @@ myApp.directive('editChatBox', ['$location', function ($location) {
 /***************************************
  * DEFINE DATA ENTITIES
  ***************************************/
-//import Field from 'admin-config/lib/Field/Field';
+
 myApp.config(['NgAdminConfigurationProvider', function (nga) {
 
     // create the default admin application
@@ -1237,9 +1305,9 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     var createUser = require('./models/users');
     var userEntity = nga.entity('users').baseApiUrl('https://kurbi.stamplayapp.com/api/user/v1/');
 
-    // customization (of chatbox)
-    var createCustomization = require('./models/customization');
-    var customizations = nga.entity('customization');
+    // chatbox styles (configurations)
+    var createChatstyle = require('./models/chatstyle');
+    var chatstyle = nga.entity('chatstyle');
 
     // chatroom replies
     var createReplies = require('./models/chatroomreplies');
@@ -1258,10 +1326,10 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     var articles = nga.entity('articles');
 
     admin.addEntity(createUser(nga, userEntity));
-    admin.addEntity(createCustomization(nga, customizations));
+    admin.addEntity(createChatstyle(nga, chatstyle));
     admin.addEntity(createReplies(nga, chatReplies, chatroom));
     admin.addEntity(createChatroom(nga, chatroom, chatReplies));
-    admin.addEntity(createChatbox(nga, chatbox, customizations, chatroom));
+    admin.addEntity(createChatbox(nga, chatbox, chatstyle, chatroom));
     admin.addEntity(createArticles(nga, articles));
 
     /***************************************
@@ -1272,7 +1340,7 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     //.addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;'))
     .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
     //.addChild(nga.menu().title('Bot Builder').icon('<span class="glyphicon glyphicon-tower"></span>&nbsp;').link('/botbuilder'))
-    ).addChild(nga.menu(nga.entity('articles')).title('Articles').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
+    ).addChild(nga.menu(nga.entity('articles')).title('Blog Posts').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
 
     /***************************************
      * CUSTOM HEADER
@@ -1284,18 +1352,15 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
      * CUSTOM DASHBOARD
      * http://ng-admin-book.marmelab.com/doc/Dashboard.html
      ***************************************/
+
     admin.dashboard(require('./custom_dashboard/main')(nga, admin, chatReplies));
 
     /***************************************
      * CUSTOM ERROR MESSAGES
      ***************************************/
 
-    // Experimental Error Handler
-    /*function appErrorHandler(response) {
-    console.log('in appErrorHandler');
-        return 'Global error: ' + response.status + '(' + response.data + ')';
-    }
-    admin.errorMessage(appErrorHandler);*/
+    var adminErrorHandlers = require('./globalNgadminCode/errorHandlers/adminErrorHandler');
+    adminErrorHandlers(admin);
 
     /***************************************
      * ATTACH ADMIN APP TO DOM & RUN
@@ -1304,32 +1369,7 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     nga.configure(admin);
 }]);
 
-// ERROR HANDLER
-
-/*function errorHandler($rootScope, $state, $translate, notification) {
-    $rootScope.$on("$stateChangeError", function handleError(event, toState, toParams, fromState, fromParams, error) {
-        if (error.status == 404) {
-            $state.go('ma-404');
-            event.preventDefault();
-        } else {
-console.log('in first error handler');
-            $translate('STATE_CHANGE_ERROR', { message: error.message }).then(text => notification.log(text, { addnCls: 'humane-flatty-error' }));
-            throw error;
-        }
-    });
-}
-*/
-/*myApp.run(errorHandler);
-
-myApp.config(['$translateProvider', function ($translateProvider) {
-    $translateProvider.translations('en', {
-      'STATE_CHANGE_ERROR': 'Error: {{ message }}'
-    });
-    //$translateProvider.preferredLanguage('en');
-}]);
-*/
-
-},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_fields/obj_key_value/obj_key_value_field_conf":4,"./custom_fields/obj_key_value/obj_key_value_field_directive":5,"./custom_fields/obj_key_value/obj_key_value_field_view":6,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":9,"./custom_pages/botbuilder/botbuilderController":10,"./custom_pages/botbuilder/index":11,"./custom_pages/chatboxconfig/chatboxconfig":12,"./custom_pages/chatboxconfig/chatboxconfigtemplate":13,"./custom_pages/conversation_reply/replyconfig":14,"./custom_pages/conversation_reply/replytemplate":15,"./models/articles":17,"./models/chatbox":18,"./models/chatroom":19,"./models/chatroomreplies":20,"./models/customization":21,"./models/users":22}],17:[function(require,module,exports){
+},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_fields/obj_key_value/obj_key_value_field_conf":4,"./custom_fields/obj_key_value/obj_key_value_field_directive":5,"./custom_fields/obj_key_value/obj_key_value_field_view":6,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":9,"./custom_pages/botbuilder/botbuilderController":10,"./custom_pages/botbuilder/index":11,"./custom_pages/chatboxconfig/chatboxconfig":12,"./custom_pages/chatboxconfig/chatboxconfigtemplate":13,"./custom_pages/conversation_reply/replyconfig":14,"./custom_pages/conversation_reply/replytemplate":15,"./globalNgadminCode/errorHandlers/adminErrorHandler":16,"./globalNgadminCode/errorHandlers/appLevelErrorHandlers":17,"./globalNgadminCode/interceptors/stamplay":18,"./models/articles":20,"./models/chatbox":21,"./models/chatroom":22,"./models/chatroomreplies":23,"./models/chatstyle":24,"./models/users":25}],20:[function(require,module,exports){
 module.exports = function (nga, articles) {
 
     // LIST VIEW
@@ -1351,26 +1391,68 @@ module.exports = function (nga, articles) {
     return articles;
 };
 
-},{}],18:[function(require,module,exports){
-module.exports = function (nga, chatbox, customizations, chatroom) {
+},{}],21:[function(require,module,exports){
+module.exports = function (nga, chatbox, chatstyle, chatroom) {
 
     // LIST VIEW
-    var listViewActionsTemplate = '<ma-export-to-csv-button entity="::entity" datastore="::datastore"></ma-export-to-csv-button>' + '<edit-chat-box entry="entry" type="create"></edit-chat-box>';
+    var listViewActionsTemplate = '<edit-chat-box entry="entry" type="create"></edit-chat-box>' + '<ma-export-to-csv-button entity="::entity" datastore="::datastore"></ma-export-to-csv-button>';
+
     var listViewListActionsTemplate = '<ma-show-button size="xs" entry="entry" entity="entity"></ma-show-button>' + '<edit-chat-box size="xs" entry="entry" type="edit"></edit-chat-box>' + '<ma-delete-button size="xs" entry="entry" entity="entity"></ma-delete-button>';
-    chatbox.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('actions', 'template').template(listViewListActionsTemplate)])
+
+    chatbox.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('id'), nga.field('actions', 'template').template(listViewListActionsTemplate)])
     //.listActions(['show','edit','delete'])
-    .actions(listViewActionsTemplate).batchActions([]);
+    //.actions(listViewActionsTemplate)
+    //.batchActions([])
+    ;
 
     // SHOW VIEW
     var showViewActionsTemplate = '<ma-list-button entry="entry" entity="entity"></ma-list-button>' + '<edit-chat-box entry="entry" type="edit"></edit-chat-box>' + '<ma-delete-button entry="entry" entity="entity"></ma-delete-button>';
-    chatbox.showView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('dt_update', 'datetime').label('Last Updated'), nga.field('customizations', 'referenced_list').label('History of changes').targetEntity(customizations).targetReferenceField('chatbox').targetFields([nga.field('chat_color').label('Color').template('<span style="display:block;height:18px;width:35px;background-color:{{value}};border-radius:2px;"></span>'), nga.field('chat_headline').label('Headline'), nga.field('chat_avatar').label('Avatar')]).sortField('dt_create').sortDir('DESC'), nga.field('chatrooms', 'referenced_list').label('Conversations') // referenced_list of ChatRoom(s)
-    .targetEntity(chatroom).targetReferenceField('parent_chatbox').targetFields([nga.field('dt_create', 'datetime').label('Occurred').format('short').isDetailLink(true), nga.field('url').label('On Web Page')]), nga.field('snippet').label('Web Snippet').cssClasses(['dont-break-out show-value short-scroll col-sm-10 col-md-8 col-lg-7'])]).title('Chatbox Detail').actions(showViewActionsTemplate);
+    chatbox.showView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('dt_update', 'datetime').label('Last Updated'), nga.field('user_owner').label('Owner')
+    // CUSTOMIZATIONS reference ==> chatstyle
+    // ,nga.field('customizations','referenced_list')
+    //     .label('History of changes')
+    //     .targetEntity(customizations)
+    //     .targetReferenceField('chatbox')
+    //     .targetFields([
+    //         nga.field('chat_color')
+    //             .label('Color')
+    //             .template('<span style="display:block;height:18px;width:35px;background-color:{{value}};border-radius:2px;"></span>'),
+    //         nga.field('chat_headline')
+    //             .label('Headline'),
+    //         nga.field('chat_avatar')
+    //             .label('Avatar')
+    //     ])
+    //     .sortField('dt_create')
+    //     .sortDir('DESC')
+    // CHATROOMS reference
+    // ,nga.field('chatroom','referenced_list')
+    //     .label('Conversations') // referenced_list of ChatRoom(s)
+    //     .targetEntity(chatroom)
+    //     .targetReferenceField('parent_chatbox')
+    //     .targetFields([
+    //         nga.field('dt_create','datetime')
+    //             .label('Occurred')
+    //             .format('short')
+    //             .isDetailLink(true)
+    //         ,nga.field('url')
+    //             .label('On Web Page')
+    //     ])
+    , nga.field('snippet') // OK
+    .label('Web Snippet').cssClasses(['dont-break-out show-value short-scroll col-sm-10 col-md-8 col-lg-7'])]).title('Chatbox Detail').actions(showViewActionsTemplate);
 
     // CREATION VIEW
-    chatbox.creationView().fields([nga.field('chat_avatar', 'file')
-    //.uploadInformation({ 'url': 'your_url', 'apifilename': 'picture_name' })
-
-    , nga.field('chat_color'), nga.field('chat_headline'), nga.field('chat_snippet'), nga.field('chat_url')]);
+    chatbox.creationView().fields([
+    // nga.field('chat_avatar','file')
+    //     //.uploadInformation({ 'url': 'your_url', 'apifilename': 'picture_name' })
+    //     ,
+    // nga.field('chat_color'),
+    // nga.field('chat_headline'),
+    // nga.field('chat_snippet'),
+    // nga.field('chat_url')
+    nga.field('user_owner'), nga.field('allowedPages'), // array_string (list of urls)
+    nga.field('bots'), // array_string (list of names)
+    nga.field('documents'), nga.field('rule'), nga.field('snippet'), nga.field('styles') // object (array of chatstyle id's)
+    ]);
 
     // EDITION VIEW
     chatbox.editionView().fields(chatbox.creationView().fields());
@@ -1381,21 +1463,20 @@ module.exports = function (nga, chatbox, customizations, chatroom) {
     return chatbox;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = function (nga, chatroom, chatReplies) {
 
     // DELETION VIEW
-    chatroom.deletionView().disable();
+    // chatroom.deletionView()
+    // .disable()
 
     // LIST VIEW
-    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"ask for email"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show']).batchActions([]).filters([nga.field('dt_create').label('Created'), nga.field('messages')]);
+    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"ask for email"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show', 'delete'])
+    //.batchActions([])
+    .filters([nga.field('dt_create').label('Created'), nga.field('messages')]);
 
     // SHOW VIEW
-    chatroom.showView().fields([nga.field('owner'), nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy, HH:mm:ss'), nga.field('dt_update', 'datetime').label('Last Updated').format('MM/dd/yyyy, HH:mm:ss')
-    // ,nga.field('key')
-    // ,nga.field('room')
-    // ,nga.field('sessionID')
-    , nga.field('messages', 'stamplay_array_str').label('Conversation Details').targetFields([nga.field('source'), nga.field('message.body.text')]).jsonParse(true).fieldValueStyles('[{"fieldName":"source", "value":"patient", "cssClass":"chat-message-source-patient"}]').cssClasses(['short-scroll']), nga.field('custom_action').label('').template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>'), nga.field('replies', 'referenced_list').label('Replies').targetEntity(chatReplies).targetReferenceField(nga.field('chatRoomId')).targetFields([nga.field('dt_create', 'datetime').label('Posted'), nga.field('replyText', 'wysiwyg').label('Detail').isDetailLink('true')
+    chatroom.showView().fields([nga.field('user_owner'), nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy, HH:mm:ss'), nga.field('dt_update', 'datetime').label('Last Updated').format('MM/dd/yyyy, HH:mm:ss'), nga.field('messages', 'stamplay_array_str').label('Conversation Details').targetFields([nga.field('source'), nga.field('message.body.text')]).jsonParse(true).fieldValueStyles('[{"fieldName":"source", "value":"patient", "cssClass":"chat-message-source-patient"}]').cssClasses(['short-scroll']), nga.field('custom_action').label('').template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>'), nga.field('replies', 'referenced_list').label('Replies').targetEntity(chatReplies).targetReferenceField(nga.field('chatRoomId')).targetFields([nga.field('dt_create', 'datetime').label('Posted'), nga.field('replyText', 'wysiwyg').label('Detail').isDetailLink('true')
     // .map(function truncate(value, entry) {
     //     return value + '(' + entry.values.subValue + ')';
     // })
@@ -1404,7 +1485,7 @@ module.exports = function (nga, chatroom, chatReplies) {
     return chatroom;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = function (nga, chatroomreplies, chatRoom) {
 
     // LIST VIEW
@@ -1435,33 +1516,34 @@ module.exports = function (nga, chatroomreplies, chatRoom) {
     return chatroomreplies;
 };
 
-},{}],21:[function(require,module,exports){
-module.exports = function (nga, customization) {
+},{}],24:[function(require,module,exports){
+module.exports = function (nga, chatstyle) {
 
     // LIST VIEW
-    customization.listView().fields([nga.field('id'), nga.field('dt_create').label('Created')]).
+    chatstyle.listView().fields([nga.field('id'), nga.field('dt_create').label('Created')]).
     //        nga.field('chat_avatar'),
     //        nga.field('chat_url')
-    listActions(['show', 'edit', 'delete']).title('Chatboxes');
+    listActions(['show', 'edit', 'delete']).title('Chatbox Styles');
 
     // SHOW VIEW
-    customization.showView().fields([nga.field('owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('chat_avatar'), nga.field('chat_color'), nga.field('chat_headline'), nga.field('chat_snippet'), nga.field('chat_url')
-    // relate concept
-    ]);
+    chatstyle.showView().fields([nga.field('user_owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('js'), nga.field('html'), nga.field('css'), nga.field('configuration', 'json')]);
 
     // CREATION VIEW
-    customization.creationView().fields([nga.field('chat_avatar', 'file')
-    //.uploadInformation({ 'url': 'your_url', 'apifilename': 'picture_name' })
-
-    , nga.field('chat_color'), nga.field('chat_headline'), nga.field('chat_snippet'), nga.field('chat_url')]);
+    chatstyle.creationView().fields([
+    // nga.field('chat_avatar'),
+    // nga.field('chat_color'),
+    // nga.field('chat_headline'),
+    // nga.field('chat_snippet'),
+    // nga.field('chat_url')
+    nga.field('configuration')]);
 
     // EDITION VIEW
-    customization.editionView().fields(customization.creationView().fields());
+    chatstyle.editionView().fields(chatstyle.creationView().fields());
 
-    return customization;
+    return chatstyle;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = function (nga, users) {
 
     // LIST VIEW
@@ -1479,7 +1561,7 @@ module.exports = function (nga, users) {
     return users;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1758,7 +1840,7 @@ var Entity = function () {
 exports.default = Entity;
 module.exports = exports["default"];
 
-},{"../Field/Field":26,"../Utils/stringUtils":30,"../View/BatchDeleteView":31,"../View/CreateView":32,"../View/DashboardView":33,"../View/DeleteView":34,"../View/EditView":35,"../View/ExportView":36,"../View/ListView":37,"../View/MenuView":38,"../View/ShowView":39}],24:[function(require,module,exports){
+},{"../Field/Field":29,"../Utils/stringUtils":33,"../View/BatchDeleteView":34,"../View/CreateView":35,"../View/DashboardView":36,"../View/DeleteView":37,"../View/EditView":38,"../View/ExportView":39,"../View/ListView":40,"../View/MenuView":41,"../View/ShowView":42}],27:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1871,7 +1953,7 @@ var Entry = function () {
 exports.default = Entry;
 module.exports = exports['default'];
 
-},{"./Utils/objectProperties":28}],25:[function(require,module,exports){
+},{"./Utils/objectProperties":31}],28:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2047,7 +2129,7 @@ var EmbeddedListField = function (_Field) {
 exports.default = EmbeddedListField;
 module.exports = exports["default"];
 
-},{"../Entity/Entity":23,"./Field":26}],26:[function(require,module,exports){
+},{"../Entity/Entity":26,"./Field":29}],29:[function(require,module,exports){
 exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -2347,7 +2429,7 @@ var Field = function () {
 exports.default = Field;
 module.exports = exports["default"];
 
-},{"../Utils/stringUtils":30}],27:[function(require,module,exports){
+},{"../Utils/stringUtils":33}],30:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     getReferencedLists: function getReferencedLists(fields) {
@@ -2392,7 +2474,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],28:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -2486,7 +2568,7 @@ function cloneAndNest(object) {
     }, {});
 }
 
-},{}],29:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     order: function order(input) {
@@ -2504,7 +2586,7 @@ exports.default = {
 };
 module.exports = exports["default"];
 
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 exports.__esModule = true;
 exports.default = {
     /**
@@ -2526,7 +2608,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -2560,7 +2642,7 @@ var BatchDeleteView = function (_View) {
 exports.default = BatchDeleteView;
 module.exports = exports['default'];
 
-},{"./View":40}],32:[function(require,module,exports){
+},{"./View":43}],35:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2702,7 +2784,7 @@ var CreateView = function (_View) {
 exports.default = CreateView;
 module.exports = exports['default'];
 
-},{"./View":40}],33:[function(require,module,exports){
+},{"./View":43}],36:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2745,7 +2827,7 @@ var DashboardView = function (_ListView) {
 exports.default = DashboardView;
 module.exports = exports['default'];
 
-},{"./ListView":37}],34:[function(require,module,exports){
+},{"./ListView":40}],37:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -2779,7 +2861,7 @@ var DeleteView = function (_View) {
 exports.default = DeleteView;
 module.exports = exports['default'];
 
-},{"./View":40}],35:[function(require,module,exports){
+},{"./View":43}],38:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2920,7 +3002,7 @@ var EditView = function (_View) {
 exports.default = EditView;
 module.exports = exports['default'];
 
-},{"./View":40}],36:[function(require,module,exports){
+},{"./View":43}],39:[function(require,module,exports){
 exports.__esModule = true;
 
 var _ListView2 = require('./ListView');
@@ -2954,7 +3036,7 @@ var ExportView = function (_ListView) {
 exports.default = ExportView;
 module.exports = exports['default'];
 
-},{"./ListView":37}],37:[function(require,module,exports){
+},{"./ListView":40}],40:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3221,7 +3303,7 @@ var ListView = function (_View) {
 exports.default = ListView;
 module.exports = exports['default'];
 
-},{"../Utils/orderElement":29,"./View":40}],38:[function(require,module,exports){
+},{"../Utils/orderElement":32,"./View":43}],41:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3279,7 +3361,7 @@ var MenuView = function (_View) {
 exports.default = MenuView;
 module.exports = exports['default'];
 
-},{"./View":40}],39:[function(require,module,exports){
+},{"./View":43}],42:[function(require,module,exports){
 exports.__esModule = true;
 
 var _View2 = require('./View');
@@ -3312,7 +3394,7 @@ var ShowView = function (_View) {
 exports.default = ShowView;
 module.exports = exports['default'];
 
-},{"./View":40}],40:[function(require,module,exports){
+},{"./View":43}],43:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3704,7 +3786,7 @@ var View = function () {
 exports.default = View;
 module.exports = exports['default'];
 
-},{"../Entry":24,"../Utils/ReferenceExtractor":27,"../Utils/objectProperties":28}],41:[function(require,module,exports){
+},{"../Entry":27,"../Utils/ReferenceExtractor":30,"../Utils/objectProperties":31}],44:[function(require,module,exports){
 exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3817,4 +3899,4 @@ var Entry = function () {
 exports.default = Entry;
 module.exports = exports['default'];
 
-},{"./Utils/objectProperties":28}]},{},[16]);
+},{"./Utils/objectProperties":31}]},{},[19]);

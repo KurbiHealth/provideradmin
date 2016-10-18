@@ -1,0 +1,71 @@
+?where={'dt_create':'06/21/2016',"field":{"$gte":value1, "$lte":value2}}
+
+// whereQuery[i] is the "obj" in all functions below
+
+var partial = JSON.stringify(this.whereQuery[i]);
+partial = partial.substring(1, partial.length-1); // get rid of curly brackets?
+if(i===0)
+	this.executable += partial;
+else
+	this.executable += ','+partial;
+var Url = '/api/' + this.model + '/' + root.Stamplay.VERSION + '/' + this.instance 
+								+'?where={'+this.executable+'}'+ this.paginationQuery + this.selectionQuery 
+								+ this.sortQuery + this.populateQuery + this.populateOwnerQuery
+
+regex: function(attr, regex, options){
+	var obj = {};
+	obj[attr] = {"$regex":regex, "$options": options};
+	this.whereQuery.push(obj);
+	return this;
+},
+			
+// obj['dt_create'] = 06/21/2016
+// {'dt_create': '06/21/2016'}
+equalTo : function(attr, value){
+	var obj = {};
+	obj[attr] = value;
+	this.whereQuery.push(obj);
+	return this;
+},
+
+notEqualTo : function(attr, value){
+	var obj = {};
+	obj[attr] = {"$ne":value};
+	this.whereQuery.push(obj)
+	return this;
+},
+
+between : function(attr, value1, value2){
+	var obj = {};
+	obj[attr] = {"$gte":value1, "$lte":value2};
+	this.whereQuery.push(obj);
+	return this;
+},
+
+greaterThan : function(attr, value){
+	var obj = {};
+	obj[attr] = {"$gt":value};
+	this.whereQuery.push(obj);
+	return this;
+},	
+
+greaterThanOrEqual : function(attr, value){
+	var obj = {};
+	obj[attr] = {"$gte":value};
+	this.whereQuery.push(obj);
+	return this;
+},
+
+lessThan : function(attr, value){
+	var obj = {};
+	obj[attr] = {"$lt":value};
+	this.whereQuery.push(obj);
+	return this;
+},	
+
+lessThanOrEqual : function(attr, value){
+	var obj = {};
+	obj[attr] = {"$lte":value};
+	this.whereQuery.push(obj);
+	return this;
+},

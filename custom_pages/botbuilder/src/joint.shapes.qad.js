@@ -386,7 +386,7 @@ joint.shapes.qad.Question = joint.shapes.basic.Generic.extend(_.extend({}, joint
     },
 
     addOption: function(option) {
-    
+console.log('in addOption');   
         var options = JSON.parse(JSON.stringify(this.get('options')));
         options.push(option);
         this.set('options', options);
@@ -454,7 +454,7 @@ joint.shapes.qad.QuestionView = joint.dia.ElementView.extend(_.extend({}, joint.
     },
 
     onAddOption: function() {
-
+console.log('in onAddOption');
         this.model.addOption({
             id: _.uniqueId('option-'),
             text: 'Option ' + this.model.get('options').length
@@ -468,3 +468,5 @@ joint.shapes.qad.QuestionView = joint.dia.ElementView.extend(_.extend({}, joint.
 }));
 
 
+// MAKE A COPY OF QUESTION TYPE, CALL IT 'FREE', OR SOMETHING, THEN TWEAK 
+// TEXT EDITING FUNCTIONALITY, MAKE OUTPORTS=1, REMOVE ABILITY TO ADD OUTPORTS

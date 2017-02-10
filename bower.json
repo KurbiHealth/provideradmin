@@ -1,0 +1,22 @@
+{
+  "name": "Kurbi Provider App",
+  "description": "Kurbi's Provider UI using ng-admin as foundation",
+  "main": "main.js",
+  "authors": [
+    "Matt Eckman <matteckman@gmail.com>"
+  ],
+  "license": "maybe",
+  "homepage": "https://github.com/KurbiHealth/provideradmin",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bower-videogular-youtube": "videogular-youtube#^2.0.6",
+    "videogular-controls": "^1.4.4"
+  }
+}

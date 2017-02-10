@@ -27,7 +27,6 @@ myApp.controller('username', ['$scope', '$window', function($scope, $window) { /
 var interceptorFunctions = require('./globalNgadminCode/interceptors/stamplay');
 interceptorFunctions(myApp);
 
-
 /***************************************
  * GLOBAL ERROR HANDLERS
  ***************************************/
@@ -42,15 +41,15 @@ errorHandlers(myApp);
  * http://ng-admin-book.marmelab.com/doc/Custom-pages.html
  ***************************************/
 
-myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
-//myApp.constant('chatServerURL', 'http://kchat:8080/chatbox');
+//myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
+myApp.constant('chatServerURL', 'http://kchat:3000/chatbox');
 
 // CHATBOX CUSTOMIZATION PAGE
 import chatboxConfigController from './custom_pages/chatboxconfig/chatboxconfig';
 import chatboxConfigControllerTemplate from './custom_pages/chatboxconfig/chatboxconfigtemplate';
 myApp.config(function($stateProvider) {
     $stateProvider.state('chatbox-config', {
-        parent: 'main',
+        parent: 'ng-admin',
         url: '/chatbox_config/:chatBoxId?',
         params: {
             chatBoxId: {squash: true, value: null}
@@ -66,7 +65,7 @@ import conversationReplyController from './custom_pages/conversation_reply/reply
 import conversationReplyTemplate from './custom_pages/conversation_reply/replytemplate';
 myApp.config(function($stateProvider) {
     $stateProvider.state('chat-conversation-reply', {
-        parent: 'main',
+        parent: 'ng-admin',
         url: '/reply_to_chat_conversation/:chatRoomId',
         controller: conversationReplyController,
         controllerAs: 'controller',
@@ -79,7 +78,7 @@ import botbuilderController from './custom_pages/botbuilder/botbuilderController
 import botbuilderTemplate from './custom_pages/botbuilder/index';
 myApp.config(function($stateProvider) {
     $stateProvider.state('botbuilder', {
-        parent: 'main',
+        parent: 'ng-admin',
         url: '/botbuilder?/:botId',
         controller: botbuilderController,
         controllerAs: 'controller',
@@ -154,8 +153,7 @@ myApp.directive('editChatBox', ['$location', function($location){
                         <span ng-if="type=='create'" class="hidden-xs ng-scope" translate="CREATE">Create</span>
                     </a>`
     }
-}])
-
+}]);
  
 /***************************************
  * DEFINE DATA ENTITIES
@@ -198,12 +196,22 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
     var createArticles = require('./models/articles');
     var articles = nga.entity('articles');
 
+    // botdialog
+    var createBotdialog = require('./models/botdialog');
+    var botdialog = nga.entity('botdialog');
+
+    // chatbot
+    var createChatbot = require('./models/chatbot');
+    var chatbot = nga.entity('chatbot');
+
     admin.addEntity(createUser(nga,userEntity));
     admin.addEntity(createChatstyle(nga,chatstyle));
     admin.addEntity(createReplies(nga,chatReplies,chatroom));
     admin.addEntity(createChatroom(nga,chatroom,chatReplies));
     admin.addEntity(createChatbox(nga,chatbox,chatstyle,chatroom));
     admin.addEntity(createArticles(nga,articles));
+    admin.addEntity(createBotdialog(nga,botdialog));
+    admin.addEntity(createChatbot(nga,chatbot));
 
 
 /***************************************
@@ -217,6 +225,9 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
             .addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu(nga.entity('chatbot')).title('Chat Bot').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu(nga.entity('botdialog')).title('Bot Dialog').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu(nga.entity('chatstyle')).title('Chat Style').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))         
             //.addChild(nga.menu().title('Bot Builder').icon('<span class="glyphicon glyphicon-tower"></span>&nbsp;').link('/botbuilder'))
         )
         .addChild(nga.menu(nga.entity('articles')).title('Blog Posts').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;'))
@@ -250,8 +261,9 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
  * CUSTOM DASHBOARD
  * http://ng-admin-book.marmelab.com/doc/Dashboard.html
  ***************************************/
-    
-    admin.dashboard(require('./custom_dashboard/main')(nga, admin, chatReplies));
+
+    var customDashboard = require('./custom_dashboard/main');
+    admin.dashboard(customDashboard(nga, admin, chatReplies));
 
 /***************************************
  * CUSTOM ERROR MESSAGES
@@ -259,7 +271,6 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
 
     var adminErrorHandlers = require('./globalNgadminCode/errorHandlers/adminErrorHandler');
     adminErrorHandlers(admin);
-
 
 /***************************************
  * ATTACH ADMIN APP TO DOM & RUN

@@ -12,11 +12,15 @@ module.exports = function(nga,chatbox,chatstyle,chatroom) {
     .fields([
         nga.field('dt_create','datetime')
             .label('Created')
+        ,nga.field('dt_update','datetime')
+            .label('Updated')
         ,nga.field('id')
-        ,nga.field('actions', 'template').template(listViewListActionsTemplate)
+        ,nga.field('owner')
+        ,nga.field('user_owner')
+        ,nga.field('actions', 'template')
+            .template(listViewListActionsTemplate)
     ])
-    //.listActions(['show','edit','delete'])
-    //.actions(listViewActionsTemplate)
+    .actions(listViewActionsTemplate)
     //.batchActions([])
     ;
 
@@ -32,19 +36,17 @@ module.exports = function(nga,chatbox,chatstyle,chatroom) {
             .label('Last Updated')
         ,nga.field('user_owner')
             .label('Owner')
+        ,nga.field('styles','json')
+        ,nga.field('bots','json')
+        ,nga.field('snippet')
 // CUSTOMIZATIONS reference ==> chatstyle
-        // ,nga.field('customizations','referenced_list')
+        // ,nga.field('chatstyle','referenced_list')
         //     .label('History of changes')
-        //     .targetEntity(customizations)
+        //     .targetEntity(chatstyle)
         //     .targetReferenceField('chatbox')
         //     .targetFields([
-        //         nga.field('chat_color')
-        //             .label('Color')
-        //             .template('<span style="display:block;height:18px;width:35px;background-color:{{value}};border-radius:2px;"></span>'),
-        //         nga.field('chat_headline')
-        //             .label('Headline'),
-        //         nga.field('chat_avatar')
-        //             .label('Avatar')
+        //         nga.field('snippet')
+        //             .label('snippet')
         //     ])
         //     .sortField('dt_create')
         //     .sortDir('DESC')
@@ -61,9 +63,9 @@ module.exports = function(nga,chatbox,chatstyle,chatroom) {
         //         ,nga.field('url')
         //             .label('On Web Page')
         //     ])
-        ,nga.field('snippet') // OK
-            .label('Web Snippet')
-            .cssClasses(['dont-break-out show-value short-scroll col-sm-10 col-md-8 col-lg-7'])
+        // ,nga.field('snippet') // OK
+        //     .label('Web Snippet')
+        //     .cssClasses(['dont-break-out show-value short-scroll col-sm-10 col-md-8 col-lg-7'])
     ])
     .title('Chatbox Detail')
     .actions(showViewActionsTemplate);
@@ -84,7 +86,8 @@ module.exports = function(nga,chatbox,chatstyle,chatroom) {
         nga.field('documents'),
         nga.field('rule'),
         nga.field('snippet'),
-        nga.field('styles') // object (array of chatstyle id's)
+        nga.field('styles'), // object (array of chatstyle id's)
+        nga.field('owner')
     ])
 
     // EDITION VIEW

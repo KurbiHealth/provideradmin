@@ -1,4 +1,4 @@
-export default function (nga, admin, replies) {
+module.exports = function (nga, admin, replies) {
 
     return nga.dashboard()
         // THIS IS A SAMPLE COLLECTION
@@ -38,4 +38,4 @@ export default function (nga, admin, replies) {
     </div>
 </div>
 `);
-}
+};

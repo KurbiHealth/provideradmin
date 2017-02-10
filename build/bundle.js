@@ -1,5 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _dashboardSummaryTemplate = require('./dashboardSummaryTemplate.js');
 
@@ -66,22 +70,23 @@ function dashboardSummary(Restangular) {
 dashboardSummary.$inject = ['Restangular'];
 
 exports.default = dashboardSummary;
-module.exports = exports['default'];
 
 },{"./dashboardSummaryTemplate.js":2}],2:[function(require,module,exports){
-exports.__esModule = true;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 exports.default = function () {
 
     return "<style>\ndashboard-summary .panel-heading{height:110px;}\ndashboard-summary .dashboard-number{height:62px}\n</style>\n<div class=\"row\">\n    <div class=\"col-lg-12\">\n        <uib-alert type=\"info\" close=\"dismissAlert()\" ng-show=\"!has_seen_alert\">\n            Welcome to the Kurbi Provider App!\n        </uib-alert>\n    </div>\n</div>\n<div class=\"row\">\n\n    <div class=\"col-lg-3 col-md-3 col-sm-3 col-xs-3\">\n        <div class=\"panel panel-primary\">\n            <div class=\"panel-heading\">\n                <div class=\"row\">\n                    <div class=\"col-xs-3\">\n                        <i class=\"fa fa-comments fa-5x\"></i>\n                    </div>\n                    <div class=\"col-xs-9 text-right\">\n                        <div class=\"huge dashboard-number\">{{ stats.conversations | number:0 }}</div>\n                        <div>Total Bot Conversations</div>\n                    </div>\n                </div>\n            </div>\n            <a ui-sref=\"list({entity:'chatroom'})\">\n                <div class=\"panel-footer\">\n                    <span class=\"pull-left\">View Details</span>\n                    <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                    <div class=\"clearfix\"></div>\n                </div>\n            </a>\n\n        </div>\n    </div>\n\n    <div class=\"col-lg-3 col-md-3 col-sm-3 col-xs-3\">\n        <div class=\"panel panel-yellow\">\n            <div class=\"panel-heading\">\n                <div class=\"row\">\n                    <div class=\"col-xs-3\">\n                        <i class=\"fa fa-question-circle-o fa-5x\"></i>\n                    </div>\n                    <div class=\"col-xs-9 text-right\">\n                        <div class=\"huge dashboard-number\">{{ stats.total_questions }}</div>\n                        <div>Total Questions</div>\n                    </div>\n                </div>\n            </div>\n            <a ui-sref=\"list({entity:'chatroom'})\">\n                <div class=\"panel-footer\">\n                    <span class=\"pull-left\">View Details</span>\n                    <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                    <div class=\"clearfix\"></div>\n                </div>\n            </a>\n        </div>\n    </div>\n\n    <div class=\"col-lg-3 col-md-3 col-sm-3 col-xs-3\">\n        <div class=\"panel panel-green\">\n            <div class=\"panel-heading\">\n                <div class=\"row\">\n                    <div class=\"col-xs-3\">\n                        <i class=\"fa fa-reply-all fa-5x\"></i>\n                    </div>\n                    <div class=\"col-xs-9 text-right\">\n                        <div class=\"huge dashboard-number\">{{ stats.replies }}</div>\n                        <div>Replies Sent</div>\n                    </div>\n                </div>\n            </div>\n            <a ui-sref=\"list({entity:'chatroomreplies'})\">\n                <div class=\"panel-footer\">\n                    <span class=\"pull-left\">View Details</span>\n                    <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                    <div class=\"clearfix\"></div>\n                </div>\n            </a>\n        </div>\n    </div>\n    \n    <!--<div class=\"col-lg-3 col-md-3 col-sm-3 col-xs-3\">\n        <div class=\"panel panel-yellow\">\n            <div class=\"panel-heading\">\n                <div class=\"row\">\n                    <div class=\"col-xs-3\">\n                        <i class=\"fa fa-question-circle-o fa-5x\"></i>\n                    </div>\n                    <div class=\"col-xs-9 text-right\">\n                        <div class=\"huge dashboard-number\">{{ stats.pending_questions }}</div>\n                        <div>Pending Questions</div>\n                    </div>\n                </div>\n            </div>\n            <a ui-sref=\"list({entity:'chatroom', search:{status:'pending'}})\">\n                <div class=\"panel-footer\">\n                    <span class=\"pull-left\">View Details</span>\n                    <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                    <div class=\"clearfix\"></div>\n                </div>\n            </a>\n        </div>\n    </div>-->\n</div>";
 };
 
-module.exports = exports["default"];
-
 },{}],3:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
 
-exports.default = function (nga, admin, replies) {
+module.exports = function (nga, admin, replies) {
 
     return nga.dashboard()
     // THIS IS A SAMPLE COLLECTION
@@ -91,10 +96,12 @@ exports.default = function (nga, admin, replies) {
     .sortField('dt_create').sortDir('DESC').perPage(20)).template('\n<div class="row">\n    <div class="col-lg-12">\n        <div class="page-header">\n            <h1>Dashboard</h1>\n        </div>\n    </div>\n</div>\n<div class="row dashboard-starter"></div>\n<dashboard-summary></dashboard-summary>\n<div class="row dashboard-content">\n    <div class="col-lg-12">\n        <div class="panel panel-default">\n            <ma-dashboard-panel collection="dashboardController.collections.pending_conversations" entries="dashboardController.entries.pending_conversations" datastore="dashboardController.datastore"></ma-dashboard-panel>\n        </div>\n    </div>\n</div>\n');
 };
 
-module.exports = exports['default'];
-
 },{}],4:[function(require,module,exports){
-exports.__esModule = true;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -116,7 +123,7 @@ var ObjKeyValueFieldConf = function (_Field) {
     function ObjKeyValueFieldConf(name) {
         _classCallCheck(this, ObjKeyValueFieldConf);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ObjKeyValueFieldConf).call(this, name));
+        var _this = _possibleConstructorReturn(this, (ObjKeyValueFieldConf.__proto__ || Object.getPrototypeOf(ObjKeyValueFieldConf)).call(this, name));
 
         _this._type = "obj_key_value_field";
         _this._keyValueChoices = null;
@@ -136,10 +143,13 @@ var ObjKeyValueFieldConf = function (_Field) {
 }(_Field3.default);
 
 exports.default = ObjKeyValueFieldConf;
-module.exports = exports["default"];
 
-},{"admin-config/lib/Field/Field":29}],5:[function(require,module,exports){
-exports.__esModule = true;
+},{"admin-config/lib/Field/Field":31}],5:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 exports.default = ObjKeyValueFieldDirective;
 function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
     return {
@@ -193,10 +203,13 @@ function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
 }
 
 ObjKeyValueFieldDirective.$inject = ['FieldViewConfiguration', '$compile'];
-module.exports = exports['default'];
 
 },{}],6:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 /*
 getReadWidget:   DISPLAYED IN listView AND showView
 getLinkWidget: 	 DISPLAYED IN listView AND showView WHEN isDetailLink IS TRUE 
@@ -215,10 +228,13 @@ exports.default = {
         return 'error: cannot display referenced_list field as filter';
     }
 };
-module.exports = exports['default'];
 
 },{}],7:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _entry = require('admin-config/lib/entry');
 
@@ -343,10 +359,13 @@ exports.default = stamplayArrayOfStrings;
 
 
 stamplayArrayOfStrings.$inject = ['NgAdminConfiguration'];
-module.exports = exports['default'];
 
-},{"admin-config/lib/entry":44}],8:[function(require,module,exports){
-exports.__esModule = true;
+},{"admin-config/lib/entry":46}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -368,7 +387,7 @@ var StamplayArrayStrField = function (_EmbeddedListField) {
     function StamplayArrayStrField(name) {
         _classCallCheck(this, StamplayArrayStrField);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StamplayArrayStrField).call(this, name));
+        var _this = _possibleConstructorReturn(this, (StamplayArrayStrField.__proto__ || Object.getPrototypeOf(StamplayArrayStrField)).call(this, name));
 
         _this._jsonParse = false;
         _this._type = "stamplay_array_str";
@@ -403,10 +422,13 @@ var StamplayArrayStrField = function (_EmbeddedListField) {
 }(_EmbeddedListField3.default);
 
 exports.default = StamplayArrayStrField;
-module.exports = exports["default"];
 
-},{"admin-config/lib/Field/EmbeddedListField":28}],9:[function(require,module,exports){
-exports.__esModule = true;
+},{"admin-config/lib/Field/EmbeddedListField":30}],9:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 /*
 getReadWidget:   DISPLAYED IN listView AND showView
 getLinkWidget:   DISPLAYED IN listView AND showView WHEN isDetailLink IS TRUE 
@@ -428,10 +450,13 @@ exports.default = {
         return '<stamplay-arr-strings field="::field" value="value" datastore="::datastore"></stamplay-arr-strings>';
     }
 };
-module.exports = exports['default'];
 
 },{}],10:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 function botbuilderController($stateParams, notification, Restangular, $q, $scope) {
 
 	/* 
@@ -458,20 +483,25 @@ function botbuilderController($stateParams, notification, Restangular, $q, $scop
 botbuilderController.$inject = ['$stateParams', 'notification', 'Restangular', '$q', '$scope'];
 
 exports.default = botbuilderController;
-module.exports = exports['default'];
 
 },{}],11:[function(require,module,exports){
-exports.__esModule = true;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 exports.default = function () {
 
   return "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\"/>\n    <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\"/>\n\n    <title>Kurbi Bots</title>\n\n    <link href=\"/custom_pages/botbuilder/cms/styles/styles.api.min.css\" rel=\"stylesheet\" />\n    \n    <!-- this file makes the arrows work correctly -->\n    <!--<link href=\"rappid/v1.6/rappid.min.css\" rel=\"stylesheet\" />-->\n    <link href=\"/custom_pages/botbuilder/jointjs/joint.css\" rel=\"stylesheet\" />\n    \n    <link href=\"/custom_pages/botbuilder/css/header.css\" rel=\"stylesheet\"/>\n    <!--<link href=\"/custom_pages/botbuilder/css/side-menu.css\" rel=\"stylesheet\" />-->\n    <link href=\"/custom_pages/botbuilder/css/toolbar.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/statusbar.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/paper.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/preview.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/halo.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/tooltip.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/snippet.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/dialog.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/index.css\" rel=\"stylesheet\"/>\n\n    <link rel=\"stylesheet\" href=\"https://opensource.keycdn.com/fontawesome/4.6.3/font-awesome.min.css\" integrity=\"sha384-Wrgq82RsEean5tP3NK3zWAemiNEXofJsTwTyHmNb/iL3dP/sZJ4+7sOld1uqYJtE\" crossorigin=\"anonymous\">\n\n  </head>\n<body>\n\n<script>\n  SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement || function(toElement) {\n  return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());\n  };\n</script>\n\n    <main class=\"content layout_sidebar\">\n\n      <section id=\"app\">\n\n        <div id=\"header\">\n            <h1>MENU</h1>\n            <span id=\"top-nav\">\n              <button class=\"btn load-example\">Reset Bot</button>\n              <button class=\"btn preview-dialog disabled\">Preview Bot</button>\n            </span>\n        </div>\n\n        <div id=\"main\">\n\n          <div id=\"toolbar\">\n            <h4>BOTS</h4>\n            <span id=\"toolbar-buttons-span\">\n              <button class=\"btn add-question\">Question</button>\n              <button class=\"btn add-answer\">Message</button>\n              <button class=\"btn add-icon\">Avatars</button>\n              <!--<button class=\"btn code-snippet\">Code Snippet</button>-->\n              <!--<button class=\"btn clear\">Clear Canvas</button>-->\n            </span>\n          </div>\n\n          <div id=\"paper\"></div>\n\n          <div id=\"statusbar\">\n            <span class=\"message\"></span>\n          </div>\n\n          <div id=\"preview\" class=\"preview\">\n          </div>\n\n        </div><!-- END #main -->\n\n      </section>\n\n    </main>\n\n    <!--<script src=\"/custom_pages/botbuilder/vendor/jquery/jquery.min.js\"></script>-->\n    <script src=\"/custom_pages/botbuilder/vendor/lodash/lodash.min.js\"></script>\n    <script src=\"/custom_pages/botbuilder/vendor/backbone/backbone-min.js\"></script>\n    <!--<script src=\"/custom_pages/botbuilder/rappid/v1.6/rappid.min.js\"></script>-->\n    <script src=\"/custom_pages/botbuilder/jointjs/joint.js\"></script>\n\n    <script src=\"/custom_pages/botbuilder/src/joint.shapes.qad.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/selection.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/factory.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/snippet.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/app.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/index.js\"></script>\n  </body>\n</html>";
 };
 
-module.exports = exports["default"];
-
 },{}],12:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 function chatboxConfigController($stateParams, notification, Restangular, $http, chatServerURL, $scope, $window) {
 
 	// URL is the location of the chat endpoints
@@ -553,7 +583,7 @@ function chatboxConfigController($stateParams, notification, Restangular, $http,
 					'chatbox': chatBoxId
 				};
 				Restangular.all('customization').post(data).then(function (response) {
-					// save the snippet & link to Customization rcd
+					// save the snippet & link to Customization rcd 
 					// to the ChatBox record
 					var customizationId = response.data.id;
 
@@ -610,19 +640,25 @@ function chatboxConfigController($stateParams, notification, Restangular, $http,
 } // END function chatboxConfigController()
 
 exports.default = chatboxConfigController;
-module.exports = exports['default'];
 
 },{}],13:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 var chatboxConfigControllerTemplate = '<style>input{margin-bottom:10px;}' + '.color-picker-action-close{overflow:auto;width:60px !important;}' + '.color-picker-swatch{width:100px !important;}' + '</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Configure your Chat Box</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-6">' + '<h4>Modify This</h4>' + '<label for="avatar">Avatar</label>' + '<input type="file" size="10" ng-model="controller.avatar" class="form-control" placeholder="avatar" name="avatar" />' + '<label for="color">Accent Color</label>' + '<color-picker ng-model="controller.color" options="options"></color-picker>' + '<span style="display:block;width:1px;height:10px;"></span>' + '<label for="headline">Headline</label>' + '<input type="text" size="10" ng-model="controller.headline" class="form-control" placeholder="headline" name="headline" />' + '<a class="btn btn-default" ng-click="controller.submitForm()">Save</a>' + '</div>' + '</div>';
 
 exports.default = chatboxConfigControllerTemplate;
-module.exports = exports['default'];
 
 },{}],14:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function processChatroomRecord(data) {
 
@@ -719,7 +755,7 @@ function formSubmit() {
 	var replyData = {
 		chatRoomId: this.chatroomId,
 		replyText: this.reply
-		//,recipient: THIS NEEDS TO HAVE A USER ID, WHICH MEANS WE NEED TO HAVE A USER RECORD ALREADY CREATED FROM THE CONVERSATION
+		//,recipient: THIS NEEDS TO HAVE A USER ID, WHICH MEANS WE NEED TO HAVE A USER RECORD ALREADY CREATED FROM THE CONVERSATION 
 	};
 	var replies = Restangular.all('chatroomreplies');
 	promises.push(replies.post(replyData).then(function (response, err) {
@@ -784,7 +820,7 @@ function conversationReplyController($stateParams, notification, Restangular, $q
 		return that;
 	});
 
-	// form submission to ChatRoomReplies data model (owner,created,replyText,chatRoomId)
+	// form submission to ChatRoomReplies data model (owner,created,replyText,chatRoomId) 
 	this.formSubmit = formSubmit;
 }
 
@@ -792,73 +828,101 @@ exports.default = conversationReplyController;
 
 
 conversationReplyController.$inject = ['$stateParams', 'notification', 'Restangular', '$q'];
-module.exports = exports['default'];
 
 },{}],15:[function(require,module,exports){
-exports.__esModule = true;
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 var conversationReplyTemplate = '<style>input{margin-bottom:10px;}.dont-break-out{overflow-wrap: break-word;word-wrap: break-word;' + '-ms-word-break: break-all;word-break: break-all;word-break: break-word;}.ta-editor{border: 1px solid gray;border-radius:5px;}</style>' + '<div class="row"><div class="col-lg-12">' + '<ma-view-actions><ma-back-button></ma-back-button></ma-view-actions>' + '<div class="page-header">' + '<h1>Reply To A Question</h1>' + '</div>' + '</div></div>' + '<div class="row">' + '<div class="col-lg-12">' + '<h4>From a potential patient...</h4>' + '<p><b>Question:</b></p>' + '<p size="10" class="form-control" style="min-height:34px !important;height:inherit;"><img ng-src="{{controller.avatar}}" width="14" height="14" /> {{controller.question}}</p>' + '<p><b>Information about patient:</b></p>' + '<p size="10" class="form-control">{{controller.tags}}</p>' + '<p><b>Your reply:</b></p>' + '<div text-angular ta-unsafe-sanitizer="false" ng-model="controller.reply" id="wysiwyg" name="wysiwyg" ta-text-editor-class="border-around" ta-html-editor-class="border-around">' + '</div>' + '<a class="btn btn-default" ng-click="controller.formSubmit()" style="margin-top:20px;">Send</a>' + '</div>' + '</div>';
 
 exports.default = conversationReplyTemplate;
-module.exports = exports['default'];
 
 },{}],16:[function(require,module,exports){
+'use strict';
+
 module.exports = function (admin) {
 
     // Experimental Error Handler
     function appErrorHandler(response) {
+
         console.log('in globalNgadminCode/errorHandlers/adminErrorHandler.js');
-        return 'Global error: ' + response.status + '(' + response.data + ')';
+
+        return 'Global ADMIN error: ' + response.status + '(' + response.data + ')';
     }
+
     admin.errorMessage(appErrorHandler);
 
     return admin;
 };
 
 },{}],17:[function(require,module,exports){
+'use strict';
+
 module.exports = function (myApp) {
 
 	/***************************************
   * RESTANGULAR ERROR HANDLER (API CALLS)
   ***************************************/
 
-	/*myApp.config(function(RestangularProvider) {
- 	    var refreshAccesstoken = function() {
-         var deferred = $q.defer();
- 	        // Refresh access-token logic
- 	        return deferred.promise;
-     };
- 	    Restangular.setErrorInterceptor(function(response, deferred, responseHandler) {
-         if(response.status === 403) {
-             refreshAccesstoken().then(function() {
-                 // Repeat the request and then call the handlers the usual way.
-                 $http(response.config).then(responseHandler, deferred.reject);
-                 // Be aware that no request interceptors are called this way.
-             });
- 	            return false; // error handled
-         }
- 	        return true; // error not handled
-     });
- });*/
+	myApp.config(function (RestangularProvider) {
+
+		//   var refreshAccesstoken = function() {
+		//       var deferred = $q.defer();
+
+		//       // TO DO: Refresh access-token logic
+		// console.log('in ',__FILE,'in refreshAccesstoken()');
+
+		//       return deferred.promise;
+		//   };
+
+		//   RestangularProvider.setErrorInterceptor(function(response, deferred, responseHandler) {
+		//       if(response.status === 403) {
+		//           refreshAccesstoken().then(function() {
+		//               // Repeat the request and then call the handlers the usual way.
+		//               $http(response.config).then(responseHandler, deferred.reject);
+		//               // Be aware that no request interceptors are called this way.
+		//           });
+
+		//           return false; // error handled
+		//       }
+
+		//       return true; // error not handled
+		//   });
+	});
 
 	/***************************************
   * CUSTOM ERROR MESSAGES
   ***************************************/
 
-	// app.errorMessage(function (response) {
-	//     return 'Global error: ' + response.status + '(' + response.data + ')';
-	// });
-
 	function errorHandler($rootScope, $state, $translate, notification) {
+
+		// delete the NG-Admin default error handler
+		delete $rootScope.$$listeners.$stateChangeError;
+
 		$rootScope.$on("$stateChangeError", function handleError(event, toState, toParams, fromState, fromParams, error) {
-			console.log('error', error);
+
+			console.log('ERROR HANDLER, error', error);
 			// console.log('event',event);
 			// console.log('toState',toState);
 			// console.log('toParams',toParams);
+			// console.log('fromState',fromState);
+			// console.log('fromParams',fromParams);
+
 			if (error.status == 404) {
 				$state.go('ma-404');
 				event.preventDefault();
 			} else {
-				$translate('STATE_CHANGE_ERROR', { message: error.message }).then(function (text) {
+				var errorMessage;
+
+				if (error.message) {
+					errorMessage = error.message;
+				} else if (error.data.error.message) {
+					errorMessage = error.data.error.message;
+				}
+
+				$translate('STATE_CHANGE_ERROR', { 'message': errorMessage }).then(function (text) {
 					return notification.log(text, { addnCls: 'humane-flatty-error' });
 				});
 				throw error;
@@ -872,14 +936,16 @@ module.exports = function (myApp) {
 		$translateProvider.translations('en', {
 			'STATE_CHANGE_ERROR': 'Error: {{ message }}'
 		});
-		//$translateProvider.preferredLanguage('en');
+		$translateProvider.preferredLanguage('en');
 	}]);
 
 	return myApp;
 };
 
 },{}],18:[function(require,module,exports){
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 module.exports = function (myApp) {
 
@@ -887,7 +953,7 @@ module.exports = function (myApp) {
   * RESTANGULAR INTERCEPTOR FUNCTIONS
   ***************************************/
 
-	myApp.config(function (RestangularProvider) {
+	myApp.config(function (RestangularProvider, $httpProvider) {
 
 		var token = window.localStorage.getItem("http://kpadmin-jwt");
 		if ((typeof token === 'undefined' ? 'undefined' : _typeof(token)) == 'object' && token == null) {
@@ -942,13 +1008,10 @@ module.exports = function (myApp) {
 
 			return { element: element, params: params };
 		});
-	});
 
-	/***************************************
-  * POST-RESTANGULAR INTERCEPTOR FUNCTIONS
-  ***************************************/
-
-	myApp.config(function ($httpProvider) {
+		/***************************************
+   * POST-RESTANGULAR INTERCEPTOR FUNCTIONS
+   ***************************************/
 
 		// USING 'unshift' TO RUN THESE FUNCTIONS FIRST!!!!
 		$httpProvider.interceptors.unshift(addContentTypeToHeader);
@@ -956,14 +1019,12 @@ module.exports = function (myApp) {
 		// these functions run in regular order (after Restangular interceptors)
 		$httpProvider.interceptors.push(fixStamplayIssues);
 
-		// **************************************************************************
-
 		/*
    * FIX ISSUES FOR STAMPLAY API
    */
 
 		// Angular removes the header 'Content-Type' if request is GET.
-		// This function is a hack to add the header back in, because Stamplay
+		// This function is a hack to add the header back in, because Stamplay 
 		// requires the header.
 		function addContentTypeToHeader() {
 			return {
@@ -980,12 +1041,15 @@ module.exports = function (myApp) {
 		function fixStamplayIssues($q) {
 			return {
 				request: function request(config) {
+
+					// console.log('in fixStamplayIssues()');
+
 					config = angular.copy(config);
 
-					// When NG-Admin does a list GET, it receives all fields for
-					// that data model, and those fields persist in the dataStore,
-					// even if the editionView only defines a couple of fields.
-					// Which means that the un-editable fields in Stamplay must be
+					// When NG-Admin does a list GET, it receives all fields for 
+					// that data model, and those fields persist in the dataStore, 
+					// even if the editionView only defines a couple of fields. 
+					// Which means that the un-editable fields in Stamplay must be 
 					// removed before doing a PUT
 					if (config.method === 'PUT') {
 						delete config.data.__v;
@@ -1003,7 +1067,7 @@ module.exports = function (myApp) {
 						config.params.where = {};
 						var where = config.params.where;
 
-						// hack to fix an NGA problem: when using 'referenced_list',
+						// hack to fix an NGA problem: when using 'referenced_list', 
 						// [object Object] appears in url
 						if (config.params._filters && '[object Object]' in config.params._filters) {
 							var temp = config.params._filters['[object Object]'];
@@ -1022,17 +1086,18 @@ module.exports = function (myApp) {
 									where[key] = { "$gte": obj[key] };
 									//where[key] = new Date(obj[key]);
 								} else {
-										where[key] = { "$regex": '/' + obj[key] + '/' };
-									}
+									where[key] = { "$regex": '/' + obj[key] + '/' };
+								}
 								delete config.params._filters[key];
 							}
 						}
-						console.log('where', where);
-						// if all the previous fixes have emptied the NGA filter object,
+						// console.log('where',where);
+						// if all the previous fixes have emptied the NGA filter object, 
 						// then delete it
 						if (isEmpty(config.params._filters)) {
 							delete config.params._filters;
 						}
+						// console.log('config',config);
 					}
 
 					return config || $q.when(config);
@@ -1068,15 +1133,14 @@ module.exports = function (myApp) {
 
 			return true;
 		}
-	});
 
-	/********************************************
-  * RESTANGULAR response INTERCEPTOR FUNCTIONS
-  ********************************************/
-
-	myApp.config(function (RestangularProvider) {
+		/********************************************
+   * RESTANGULAR response INTERCEPTOR FUNCTIONS
+   ********************************************/
 
 		RestangularProvider.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
+
+			//console.log('in addResponseInterceptor');
 
 			var newResponse;
 			//console.log('Response',response);
@@ -1102,14 +1166,16 @@ module.exports = function (myApp) {
 				response.totalCount = contentRange;
 			}
 
+			//console.log('newResponse',newResponse);
+
 			return newResponse;
 		});
 	});
-
-	return myApp;
 };
 
 },{}],19:[function(require,module,exports){
+'use strict';
+
 var _chatboxconfig = require('./custom_pages/chatboxconfig/chatboxconfig');
 
 var _chatboxconfig2 = _interopRequireDefault(_chatboxconfig);
@@ -1192,14 +1258,14 @@ errorHandlers(myApp);
  * http://ng-admin-book.marmelab.com/doc/Custom-pages.html
  ***************************************/
 
-myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
-//myApp.constant('chatServerURL', 'http://kchat:8080/chatbox');
+//myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
+myApp.constant('chatServerURL', 'http://kchat:3000/chatbox');
 
 // CHATBOX CUSTOMIZATION PAGE
 
 myApp.config(function ($stateProvider) {
     $stateProvider.state('chatbox-config', {
-        parent: 'main',
+        parent: 'ng-admin',
         url: '/chatbox_config/:chatBoxId?',
         params: {
             chatBoxId: { squash: true, value: null }
@@ -1214,7 +1280,7 @@ myApp.config(function ($stateProvider) {
 
 myApp.config(function ($stateProvider) {
     $stateProvider.state('chat-conversation-reply', {
-        parent: 'main',
+        parent: 'ng-admin',
         url: '/reply_to_chat_conversation/:chatRoomId',
         controller: _replyconfig2.default,
         controllerAs: 'controller',
@@ -1226,7 +1292,7 @@ myApp.config(function ($stateProvider) {
 
 myApp.config(function ($stateProvider) {
     $stateProvider.state('botbuilder', {
-        parent: 'main',
+        parent: 'ng-admin',
         url: '/botbuilder?/:botId',
         controller: _botbuilderController2.default,
         controllerAs: 'controller',
@@ -1325,12 +1391,22 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     var createArticles = require('./models/articles');
     var articles = nga.entity('articles');
 
+    // botdialog
+    var createBotdialog = require('./models/botdialog');
+    var botdialog = nga.entity('botdialog');
+
+    // chatbot
+    var createChatbot = require('./models/chatbot');
+    var chatbot = nga.entity('chatbot');
+
     admin.addEntity(createUser(nga, userEntity));
     admin.addEntity(createChatstyle(nga, chatstyle));
     admin.addEntity(createReplies(nga, chatReplies, chatroom));
     admin.addEntity(createChatroom(nga, chatroom, chatReplies));
     admin.addEntity(createChatbox(nga, chatbox, chatstyle, chatroom));
     admin.addEntity(createArticles(nga, articles));
+    admin.addEntity(createBotdialog(nga, botdialog));
+    admin.addEntity(createChatbot(nga, chatbot));
 
     /***************************************
      * CUSTOM MENU
@@ -1338,7 +1414,7 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
 
     admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard'))
     //.addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;'))
-    .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+    .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbot')).title('Chat Bot').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('botdialog')).title('Bot Dialog').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatstyle')).title('Chat Style').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
     //.addChild(nga.menu().title('Bot Builder').icon('<span class="glyphicon glyphicon-tower"></span>&nbsp;').link('/botbuilder'))
     ).addChild(nga.menu(nga.entity('articles')).title('Blog Posts').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
 
@@ -1353,7 +1429,8 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
      * http://ng-admin-book.marmelab.com/doc/Dashboard.html
      ***************************************/
 
-    admin.dashboard(require('./custom_dashboard/main')(nga, admin, chatReplies));
+    var customDashboard = require('./custom_dashboard/main');
+    admin.dashboard(customDashboard(nga, admin, chatReplies));
 
     /***************************************
      * CUSTOM ERROR MESSAGES
@@ -1369,7 +1446,9 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     nga.configure(admin);
 }]);
 
-},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_fields/obj_key_value/obj_key_value_field_conf":4,"./custom_fields/obj_key_value/obj_key_value_field_directive":5,"./custom_fields/obj_key_value/obj_key_value_field_view":6,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":9,"./custom_pages/botbuilder/botbuilderController":10,"./custom_pages/botbuilder/index":11,"./custom_pages/chatboxconfig/chatboxconfig":12,"./custom_pages/chatboxconfig/chatboxconfigtemplate":13,"./custom_pages/conversation_reply/replyconfig":14,"./custom_pages/conversation_reply/replytemplate":15,"./globalNgadminCode/errorHandlers/adminErrorHandler":16,"./globalNgadminCode/errorHandlers/appLevelErrorHandlers":17,"./globalNgadminCode/interceptors/stamplay":18,"./models/articles":20,"./models/chatbox":21,"./models/chatroom":22,"./models/chatroomreplies":23,"./models/chatstyle":24,"./models/users":25}],20:[function(require,module,exports){
+},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_fields/obj_key_value/obj_key_value_field_conf":4,"./custom_fields/obj_key_value/obj_key_value_field_directive":5,"./custom_fields/obj_key_value/obj_key_value_field_view":6,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":9,"./custom_pages/botbuilder/botbuilderController":10,"./custom_pages/botbuilder/index":11,"./custom_pages/chatboxconfig/chatboxconfig":12,"./custom_pages/chatboxconfig/chatboxconfigtemplate":13,"./custom_pages/conversation_reply/replyconfig":14,"./custom_pages/conversation_reply/replytemplate":15,"./globalNgadminCode/errorHandlers/adminErrorHandler":16,"./globalNgadminCode/errorHandlers/appLevelErrorHandlers":17,"./globalNgadminCode/interceptors/stamplay":18,"./models/articles":20,"./models/botdialog":21,"./models/chatbot":22,"./models/chatbox":23,"./models/chatroom":24,"./models/chatroomreplies":25,"./models/chatstyle":26,"./models/users":27}],20:[function(require,module,exports){
+'use strict';
+
 module.exports = function (nga, articles) {
 
     // LIST VIEW
@@ -1392,6 +1471,54 @@ module.exports = function (nga, articles) {
 };
 
 },{}],21:[function(require,module,exports){
+'use strict';
+
+module.exports = function (nga, botdialog) {
+
+    // LIST VIEW
+    botdialog.listView().fields([nga.field('id'), nga.field('dt_create').label('Created'), nga.field('name')]).listActions(['show', 'edit', 'delete']).title('Bot Dialog Nodes');
+
+    // SHOW VIEW
+    botdialog.showView().fields([nga.field('owner'), nga.field('user_owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('name'), nga.field('qcode'), nga.field('stuff', 'json')]);
+
+    // CREATION VIEW
+    botdialog.creationView().fields([
+    // nga.field('chat_avatar'),
+    // nga.field('chat_color'),
+    // nga.field('chat_headline'),
+    // nga.field('chat_snippet'),
+    // nga.field('chat_url')
+    nga.field('configuration')]);
+
+    // EDITION VIEW
+    botdialog.editionView().fields(botdialog.creationView().fields());
+
+    return botdialog;
+};
+
+},{}],22:[function(require,module,exports){
+'use strict';
+
+module.exports = function (nga, chatbot) {
+
+    // LIST VIEW
+    chatbot.listView().fields([nga.field('id'), nga.field('dt_create').label('Created'), nga.field('name'), nga.field('owner')]).listActions(['show', 'edit', 'delete']).title('Bot Dialog Nodes');
+
+    // SHOW VIEW
+    chatbot.showView().fields([nga.field('user_owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('name')]);
+
+    // CREATION VIEW
+    chatbot.creationView().fields([nga.field('name'), nga.field('owner'), nga.field('user_owner')]);
+
+    // EDITION VIEW
+    chatbot.editionView().fields(chatbot.creationView().fields());
+
+    return chatbot;
+};
+
+},{}],23:[function(require,module,exports){
+'use strict';
+
 module.exports = function (nga, chatbox, chatstyle, chatroom) {
 
     // LIST VIEW
@@ -1399,28 +1526,21 @@ module.exports = function (nga, chatbox, chatstyle, chatroom) {
 
     var listViewListActionsTemplate = '<ma-show-button size="xs" entry="entry" entity="entity"></ma-show-button>' + '<edit-chat-box size="xs" entry="entry" type="edit"></edit-chat-box>' + '<ma-delete-button size="xs" entry="entry" entity="entity"></ma-delete-button>';
 
-    chatbox.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('id'), nga.field('actions', 'template').template(listViewListActionsTemplate)])
-    //.listActions(['show','edit','delete'])
-    //.actions(listViewActionsTemplate)
+    chatbox.listView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('dt_update', 'datetime').label('Updated'), nga.field('id'), nga.field('owner'), nga.field('user_owner'), nga.field('actions', 'template').template(listViewListActionsTemplate)]).actions(listViewActionsTemplate)
     //.batchActions([])
     ;
 
     // SHOW VIEW
     var showViewActionsTemplate = '<ma-list-button entry="entry" entity="entity"></ma-list-button>' + '<edit-chat-box entry="entry" type="edit"></edit-chat-box>' + '<ma-delete-button entry="entry" entity="entity"></ma-delete-button>';
-    chatbox.showView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('dt_update', 'datetime').label('Last Updated'), nga.field('user_owner').label('Owner')
+    chatbox.showView().fields([nga.field('dt_create', 'datetime').label('Created'), nga.field('dt_update', 'datetime').label('Last Updated'), nga.field('user_owner').label('Owner'), nga.field('styles', 'json'), nga.field('bots', 'json'), nga.field('snippet')
     // CUSTOMIZATIONS reference ==> chatstyle
-    // ,nga.field('customizations','referenced_list')
+    // ,nga.field('chatstyle','referenced_list')
     //     .label('History of changes')
-    //     .targetEntity(customizations)
+    //     .targetEntity(chatstyle)
     //     .targetReferenceField('chatbox')
     //     .targetFields([
-    //         nga.field('chat_color')
-    //             .label('Color')
-    //             .template('<span style="display:block;height:18px;width:35px;background-color:{{value}};border-radius:2px;"></span>'),
-    //         nga.field('chat_headline')
-    //             .label('Headline'),
-    //         nga.field('chat_avatar')
-    //             .label('Avatar')
+    //         nga.field('snippet')
+    //             .label('snippet')
     //     ])
     //     .sortField('dt_create')
     //     .sortDir('DESC')
@@ -1437,8 +1557,10 @@ module.exports = function (nga, chatbox, chatstyle, chatroom) {
     //         ,nga.field('url')
     //             .label('On Web Page')
     //     ])
-    , nga.field('snippet') // OK
-    .label('Web Snippet').cssClasses(['dont-break-out show-value short-scroll col-sm-10 col-md-8 col-lg-7'])]).title('Chatbox Detail').actions(showViewActionsTemplate);
+    // ,nga.field('snippet') // OK
+    //     .label('Web Snippet')
+    //     .cssClasses(['dont-break-out show-value short-scroll col-sm-10 col-md-8 col-lg-7'])
+    ]).title('Chatbox Detail').actions(showViewActionsTemplate);
 
     // CREATION VIEW
     chatbox.creationView().fields([
@@ -1451,8 +1573,8 @@ module.exports = function (nga, chatbox, chatstyle, chatroom) {
     // nga.field('chat_url')
     nga.field('user_owner'), nga.field('allowedPages'), // array_string (list of urls)
     nga.field('bots'), // array_string (list of names)
-    nga.field('documents'), nga.field('rule'), nga.field('snippet'), nga.field('styles') // object (array of chatstyle id's)
-    ]);
+    nga.field('documents'), nga.field('rule'), nga.field('snippet'), nga.field('styles'), // object (array of chatstyle id's)
+    nga.field('owner')]);
 
     // EDITION VIEW
     chatbox.editionView().fields(chatbox.creationView().fields());
@@ -1463,7 +1585,9 @@ module.exports = function (nga, chatbox, chatstyle, chatroom) {
     return chatbox;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
+'use strict';
+
 module.exports = function (nga, chatroom, chatReplies) {
 
     // DELETION VIEW
@@ -1485,7 +1609,9 @@ module.exports = function (nga, chatroom, chatReplies) {
     return chatroom;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
+'use strict';
+
 module.exports = function (nga, chatroomreplies, chatRoom) {
 
     // LIST VIEW
@@ -1516,14 +1642,13 @@ module.exports = function (nga, chatroomreplies, chatRoom) {
     return chatroomreplies;
 };
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
+'use strict';
+
 module.exports = function (nga, chatstyle) {
 
     // LIST VIEW
-    chatstyle.listView().fields([nga.field('id'), nga.field('dt_create').label('Created')]).
-    //        nga.field('chat_avatar'),
-    //        nga.field('chat_url')
-    listActions(['show', 'edit', 'delete']).title('Chatbox Styles');
+    chatstyle.listView().fields([nga.field('id'), nga.field('dt_create').label('Created')]).listActions(['show', 'edit', 'delete']).title('Chatbox Styles');
 
     // SHOW VIEW
     chatstyle.showView().fields([nga.field('user_owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('js'), nga.field('html'), nga.field('css'), nga.field('configuration', 'json')]);
@@ -1543,7 +1668,9 @@ module.exports = function (nga, chatstyle) {
     return chatstyle;
 };
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
+'use strict';
+
 module.exports = function (nga, users) {
 
     // LIST VIEW
@@ -1561,8 +1688,12 @@ module.exports = function (nga, users) {
     return users;
 };
 
-},{}],26:[function(require,module,exports){
-exports.__esModule = true;
+},{}],28:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1633,6 +1764,7 @@ var Entity = function () {
         this._updateMethod = null; // manually set the HTTP-method for update operation, defaults to put
         this._retrieveMethod = null; // manually set the HTTP-method for the get operation, defaults to get
         this._deleteMethod = null; // manually set the HTTP-method for the delete operation, defaults to delete
+
 
         this._initViews();
     }
@@ -1838,10 +1970,13 @@ var Entity = function () {
 }();
 
 exports.default = Entity;
-module.exports = exports["default"];
 
-},{"../Field/Field":29,"../Utils/stringUtils":33,"../View/BatchDeleteView":34,"../View/CreateView":35,"../View/DashboardView":36,"../View/DeleteView":37,"../View/EditView":38,"../View/ExportView":39,"../View/ListView":40,"../View/MenuView":41,"../View/ShowView":42}],27:[function(require,module,exports){
-exports.__esModule = true;
+},{"../Field/Field":31,"../Utils/stringUtils":35,"../View/BatchDeleteView":36,"../View/CreateView":37,"../View/DashboardView":38,"../View/DeleteView":39,"../View/EditView":40,"../View/ExportView":41,"../View/ListView":42,"../View/MenuView":43,"../View/ShowView":44}],29:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1909,9 +2044,9 @@ var Entry = function () {
     }, {
         key: 'createFromRest',
         value: function createFromRest(restEntry) {
-            var fields = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-            var entityName = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
-            var identifierName = arguments.length <= 3 || arguments[3] === undefined ? 'id' : arguments[3];
+            var fields = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var entityName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+            var identifierName = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'id';
 
             if (!restEntry || Object.keys(restEntry).length == 0) {
                 return Entry.createForFields(fields, entityName);
@@ -1951,10 +2086,13 @@ var Entry = function () {
 }();
 
 exports.default = Entry;
-module.exports = exports['default'];
 
-},{"./Utils/objectProperties":31}],28:[function(require,module,exports){
-exports.__esModule = true;
+},{"./Utils/objectProperties":33}],30:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1995,14 +2133,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  *          new StringField('body')
  *        ])
  */
-
 var EmbeddedListField = function (_Field) {
     _inherits(EmbeddedListField, _Field);
 
     function EmbeddedListField(name) {
         _classCallCheck(this, EmbeddedListField);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EmbeddedListField).call(this, name));
+        var _this = _possibleConstructorReturn(this, (EmbeddedListField.__proto__ || Object.getPrototypeOf(EmbeddedListField)).call(this, name));
 
         _this._type = 'embedded_list';
         _this._flattenable = false;
@@ -2127,12 +2264,15 @@ var EmbeddedListField = function (_Field) {
 }(_Field3.default);
 
 exports.default = EmbeddedListField;
-module.exports = exports["default"];
 
-},{"../Entity/Entity":26,"./Field":29}],29:[function(require,module,exports){
-exports.__esModule = true;
+},{"../Entity/Entity":28,"./Field":31}],31:[function(require,module,exports){
+"use strict";
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -2409,7 +2549,7 @@ var Field = function () {
     }, {
         key: "template",
         value: function template(_template) {
-            var templateIncludesLabel = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+            var templateIncludesLabel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
             if (!arguments.length) return this._template;
             this._template = _template;
@@ -2427,10 +2567,13 @@ var Field = function () {
 }();
 
 exports.default = Field;
-module.exports = exports["default"];
 
-},{"../Utils/stringUtils":33}],30:[function(require,module,exports){
-exports.__esModule = true;
+},{"../Utils/stringUtils":35}],32:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 exports.default = {
     getReferencedLists: function getReferencedLists(fields) {
         return this.indexByName(fields.filter(function (f) {
@@ -2438,7 +2581,7 @@ exports.default = {
         }));
     },
     getReferences: function getReferences(fields, withRemoteComplete) {
-        var optimized = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+        var optimized = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
         var references = fields.filter(function (f) {
             return f.type() === 'reference' || f.type() === 'reference_many';
@@ -2472,12 +2615,15 @@ exports.default = {
         }, {});
     }
 };
-module.exports = exports['default'];
 
-},{}],31:[function(require,module,exports){
-exports.__esModule = true;
+},{}],33:[function(require,module,exports){
+'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 exports.clone = clone;
 exports.cloneAndFlatten = cloneAndFlatten;
@@ -2512,7 +2658,7 @@ function clone(object) {
  * @return {Object}
  */
 function cloneAndFlatten(object) {
-    var excludedProperties = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var excludedProperties = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     if ((typeof object === 'undefined' ? 'undefined' : _typeof(object)) !== 'object') {
         throw new Error('Expecting an object parameter');
@@ -2568,8 +2714,12 @@ function cloneAndNest(object) {
     }, {});
 }
 
-},{}],32:[function(require,module,exports){
-exports.__esModule = true;
+},{}],34:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 exports.default = {
     order: function order(input) {
         var results = [],
@@ -2584,10 +2734,13 @@ exports.default = {
         });
     }
 };
-module.exports = exports["default"];
 
-},{}],33:[function(require,module,exports){
-exports.__esModule = true;
+},{}],35:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 exports.default = {
     /**
      * @see http://stackoverflow.com/questions/10425287/convert-string-to-camelcase-with-regular-expression
@@ -2606,10 +2759,13 @@ exports.default = {
         });
     }
 };
-module.exports = exports['default'];
 
-},{}],34:[function(require,module,exports){
-exports.__esModule = true;
+},{}],36:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _View2 = require('./View');
 
@@ -2629,7 +2785,7 @@ var BatchDeleteView = function (_View) {
     function BatchDeleteView(name) {
         _classCallCheck(this, BatchDeleteView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BatchDeleteView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (BatchDeleteView.__proto__ || Object.getPrototypeOf(BatchDeleteView)).call(this, name));
 
         _this._type = 'BatchDeleteView';
         _this._enabled = true;
@@ -2640,10 +2796,13 @@ var BatchDeleteView = function (_View) {
 }(_View3.default);
 
 exports.default = BatchDeleteView;
-module.exports = exports['default'];
 
-},{"./View":43}],35:[function(require,module,exports){
-exports.__esModule = true;
+},{"./View":45}],37:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -2665,7 +2824,7 @@ var CreateView = function (_View) {
     function CreateView(name) {
         _classCallCheck(this, CreateView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CreateView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (CreateView.__proto__ || Object.getPrototypeOf(CreateView)).call(this, name));
 
         _this._type = 'CreateView';
         _this._submitCreationSuccess = null;
@@ -2782,10 +2941,13 @@ var CreateView = function (_View) {
 }(_View3.default);
 
 exports.default = CreateView;
-module.exports = exports['default'];
 
-},{"./View":43}],36:[function(require,module,exports){
-exports.__esModule = true;
+},{"./View":45}],38:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -2807,7 +2969,7 @@ var DashboardView = function (_ListView) {
     function DashboardView() {
         _classCallCheck(this, DashboardView);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(DashboardView).apply(this, arguments));
+        return _possibleConstructorReturn(this, (DashboardView.__proto__ || Object.getPrototypeOf(DashboardView)).apply(this, arguments));
     }
 
     _createClass(DashboardView, [{
@@ -2825,10 +2987,13 @@ var DashboardView = function (_ListView) {
 }(_ListView3.default);
 
 exports.default = DashboardView;
-module.exports = exports['default'];
 
-},{"./ListView":40}],37:[function(require,module,exports){
-exports.__esModule = true;
+},{"./ListView":42}],39:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _View2 = require('./View');
 
@@ -2848,7 +3013,7 @@ var DeleteView = function (_View) {
     function DeleteView(name) {
         _classCallCheck(this, DeleteView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DeleteView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (DeleteView.__proto__ || Object.getPrototypeOf(DeleteView)).call(this, name));
 
         _this._type = 'DeleteView';
         _this._enabled = true;
@@ -2859,10 +3024,13 @@ var DeleteView = function (_View) {
 }(_View3.default);
 
 exports.default = DeleteView;
-module.exports = exports['default'];
 
-},{"./View":43}],38:[function(require,module,exports){
-exports.__esModule = true;
+},{"./View":45}],40:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -2884,7 +3052,7 @@ var EditView = function (_View) {
     function EditView(name) {
         _classCallCheck(this, EditView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EditView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (EditView.__proto__ || Object.getPrototypeOf(EditView)).call(this, name));
 
         _this._type = 'EditView';
         _this._submitCreationSuccess = null;
@@ -3000,10 +3168,13 @@ var EditView = function (_View) {
 }(_View3.default);
 
 exports.default = EditView;
-module.exports = exports['default'];
 
-},{"./View":43}],39:[function(require,module,exports){
-exports.__esModule = true;
+},{"./View":45}],41:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _ListView2 = require('./ListView');
 
@@ -3023,7 +3194,7 @@ var ExportView = function (_ListView) {
     function ExportView(name) {
         _classCallCheck(this, ExportView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ExportView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (ExportView.__proto__ || Object.getPrototypeOf(ExportView)).call(this, name));
 
         _this._fields = [];
         _this._type = 'ExportView';
@@ -3034,10 +3205,13 @@ var ExportView = function (_ListView) {
 }(_ListView3.default);
 
 exports.default = ExportView;
-module.exports = exports['default'];
 
-},{"./ListView":40}],40:[function(require,module,exports){
-exports.__esModule = true;
+},{"./ListView":42}],42:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -3063,7 +3237,7 @@ var ListView = function (_View) {
     function ListView(name) {
         _classCallCheck(this, ListView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ListView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (ListView.__proto__ || Object.getPrototypeOf(ListView)).call(this, name));
 
         _this._type = 'ListView';
         _this._perPage = 30;
@@ -3301,10 +3475,13 @@ var ListView = function (_View) {
 }(_View3.default);
 
 exports.default = ListView;
-module.exports = exports['default'];
 
-},{"../Utils/orderElement":32,"./View":43}],41:[function(require,module,exports){
-exports.__esModule = true;
+},{"../Utils/orderElement":34,"./View":45}],43:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -3326,7 +3503,7 @@ var MenuView = function (_View) {
     function MenuView(name) {
         _classCallCheck(this, MenuView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(MenuView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (MenuView.__proto__ || Object.getPrototypeOf(MenuView)).call(this, name));
 
         _this._type = 'MenuView';
         _this._icon = null;
@@ -3359,10 +3536,13 @@ var MenuView = function (_View) {
 }(_View3.default);
 
 exports.default = MenuView;
-module.exports = exports['default'];
 
-},{"./View":43}],42:[function(require,module,exports){
-exports.__esModule = true;
+},{"./View":45}],44:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _View2 = require('./View');
 
@@ -3382,7 +3562,7 @@ var ShowView = function (_View) {
     function ShowView(name) {
         _classCallCheck(this, ShowView);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ShowView).call(this, name));
+        var _this = _possibleConstructorReturn(this, (ShowView.__proto__ || Object.getPrototypeOf(ShowView)).call(this, name));
 
         _this._type = 'ShowView';
         return _this;
@@ -3392,10 +3572,13 @@ var ShowView = function (_View) {
 }(_View3.default);
 
 exports.default = ShowView;
-module.exports = exports['default'];
 
-},{"./View":43}],43:[function(require,module,exports){
-exports.__esModule = true;
+},{"./View":45}],45:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -3784,10 +3967,13 @@ var View = function () {
 }();
 
 exports.default = View;
-module.exports = exports['default'];
 
-},{"../Entry":27,"../Utils/ReferenceExtractor":30,"../Utils/objectProperties":31}],44:[function(require,module,exports){
-exports.__esModule = true;
+},{"../Entry":29,"../Utils/ReferenceExtractor":32,"../Utils/objectProperties":33}],46:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -3855,9 +4041,9 @@ var Entry = function () {
     }, {
         key: 'createFromRest',
         value: function createFromRest(restEntry) {
-            var fields = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-            var entityName = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
-            var identifierName = arguments.length <= 3 || arguments[3] === undefined ? 'id' : arguments[3];
+            var fields = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var entityName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+            var identifierName = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'id';
 
             if (!restEntry || Object.keys(restEntry).length == 0) {
                 return Entry.createForFields(fields, entityName);
@@ -3897,6 +4083,5 @@ var Entry = function () {
 }();
 
 exports.default = Entry;
-module.exports = exports['default'];
 
-},{"./Utils/objectProperties":31}]},{},[19]);
+},{"./Utils/objectProperties":33}]},{},[19]);

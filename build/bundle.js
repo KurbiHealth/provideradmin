@@ -97,6 +97,50 @@ module.exports = function (nga, admin, replies) {
 };
 
 },{}],4:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function showPatientMessages() {
+    return {
+        restrict: 'E',
+        // scope: false,
+        controller: function controller($scope) {},
+        link: function link(scope, element) {
+            console.log('scope', scope);
+            scope.messages = [];
+
+            var messages = scope.entry.values.messages;
+            var temp;
+
+            if (messages) {
+                messages.map(function (currMessage) {
+                    if ((typeof currMessage === 'undefined' ? 'undefined' : _typeof(currMessage)) != 'object') currMessage = JSON.parse(currMessage);
+                    if (currMessage.source == 'patient') {
+                        temp = {
+                            'variable': currMessage.message.variable,
+                            'qCode': currMessage.message.qCode,
+                            'body': currMessage.message.body
+                        };
+                        scope.messages.push(temp);
+                    }
+                });
+            }
+            console.log('scope.messages', scope.messages);
+        },
+        template: '\n        <div id="row-{{ field.name() }}" class="form-field form-group has-feedback" style="margin:0;">\n    <div class="row">\n        <div class="col-md-4">VARIABLE</div>\n        <div class="col-md-4">QCODE</div>\n        <div class="col-md-4">BODY OF MESSAGE</div>\n    </div>\n    <div ng-repeat="m in messages" style="margin:10px 0;background-color:#FAF0E6;border-radius:5px;display:block;width:100%;overflow:auto;">\n        <div class="col-md-4">{{m.variable}}</div>\n        <div class="col-md-4">{{m.qCode}}</div>\n        <div class="col-md-4" style="overflow:hidden;word-wrap: break-word;">{{m.body}}</div>\n    </div>\n</div>\n'
+    };
+}
+
+showPatientMessages.$inject = [];
+
+exports.default = showPatientMessages;
+
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -144,12 +188,15 @@ var ObjKeyValueFieldConf = function (_Field) {
 
 exports.default = ObjKeyValueFieldConf;
 
-},{"admin-config/lib/Field/Field":31}],5:[function(require,module,exports){
+},{"admin-config/lib/Field/Field":32}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 exports.default = ObjKeyValueFieldDirective;
 function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
     return {
@@ -171,17 +218,19 @@ function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
             // '{"qCode":"back pain details"}'
             var choices = JSON.parse(field._keyValueChoices);
             var messages = scope.entry.values.messages;
-            var displayValue = '--User did not leave a question--';
-            if (messages) {
+            var displayValue = '--NONE--';
+            scope.highlightQuestion = '';
 
+            if (messages) {
                 messages.map(function (currMessage) {
                     // TO DO: to make this more universally useful, take out hard coded references to 'patient' and 'qCode'
-                    currMessage = JSON.parse(currMessage);
+                    if ((typeof currMessage === 'undefined' ? 'undefined' : _typeof(currMessage)) != 'object') currMessage = JSON.parse(currMessage);
                     if (currMessage.source == 'patient') {
                         if (currMessage.message.qCode) {
                             if (currMessage.message.qCode == choices.qCode) {
                                 if (currMessage.message.body.text != '') {
                                     displayValue = currMessage.message.body.text;
+                                    scope.highlightQuestion = 'highlight-question';
                                 }
                             }
                         }
@@ -194,7 +243,7 @@ function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
                 return 'ng-admin-field-' + field.name().replace('.', '_') + ' ng-admin-type-' + type + ' ' + (field.getCssClasses(entry) || 'col-sm-10 col-md-8 col-lg-7');
             };
 
-            var template = '<div id="row-{{ field.name() }}" class="form-field form-group has-feedback" ng-class="" style="margin:0;">\n    <label for="{{ field.name() }}" class="col-sm-2 control-label">\n        {{ field.label() }}\n    </label>\n    <div ng-class="field.getCssClasses(entry)||\'col-sm-10\'">\n        {{displayValue}}\n    </div>\n</div>';
+            var template = '<div id="row-{{ field.name() }}" class="form-field form-group has-feedback" ng-class="" style="margin:0;">\n    <style>.highlight-question{font-weight: 700;}</style>\n    <label for="{{ field.name() }}" class="col-sm-2 control-label">\n        {{ field.label() }}\n    </label>\n    <div ng-class="field.getCssClasses(entry)||\'col-sm-10\'">\n        <span ng-class="highlightQuestion">{{displayValue}}</span>\n    </div>\n</div>';
 
             element.append(template);
             $compile(element.contents())(scope);
@@ -204,7 +253,7 @@ function ObjKeyValueFieldDirective(FieldViewConfiguration, $compile) {
 
 ObjKeyValueFieldDirective.$inject = ['FieldViewConfiguration', '$compile'];
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -229,7 +278,7 @@ exports.default = {
     }
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -360,7 +409,7 @@ exports.default = stamplayArrayOfStrings;
 
 stamplayArrayOfStrings.$inject = ['NgAdminConfiguration'];
 
-},{"admin-config/lib/entry":46}],8:[function(require,module,exports){
+},{"admin-config/lib/entry":47}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -423,7 +472,7 @@ var StamplayArrayStrField = function (_EmbeddedListField) {
 
 exports.default = StamplayArrayStrField;
 
-},{"admin-config/lib/Field/EmbeddedListField":30}],9:[function(require,module,exports){
+},{"admin-config/lib/Field/EmbeddedListField":31}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -451,7 +500,7 @@ exports.default = {
     }
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -484,7 +533,7 @@ botbuilderController.$inject = ['$stateParams', 'notification', 'Restangular', '
 
 exports.default = botbuilderController;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -496,7 +545,7 @@ exports.default = function () {
   return "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\"/>\n    <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\"/>\n\n    <title>Kurbi Bots</title>\n\n    <link href=\"/custom_pages/botbuilder/cms/styles/styles.api.min.css\" rel=\"stylesheet\" />\n    \n    <!-- this file makes the arrows work correctly -->\n    <!--<link href=\"rappid/v1.6/rappid.min.css\" rel=\"stylesheet\" />-->\n    <link href=\"/custom_pages/botbuilder/jointjs/joint.css\" rel=\"stylesheet\" />\n    \n    <link href=\"/custom_pages/botbuilder/css/header.css\" rel=\"stylesheet\"/>\n    <!--<link href=\"/custom_pages/botbuilder/css/side-menu.css\" rel=\"stylesheet\" />-->\n    <link href=\"/custom_pages/botbuilder/css/toolbar.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/statusbar.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/paper.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/preview.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/halo.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/tooltip.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/snippet.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/dialog.css\" rel=\"stylesheet\"/>\n    <link href=\"/custom_pages/botbuilder/css/index.css\" rel=\"stylesheet\"/>\n\n    <link rel=\"stylesheet\" href=\"https://opensource.keycdn.com/fontawesome/4.6.3/font-awesome.min.css\" integrity=\"sha384-Wrgq82RsEean5tP3NK3zWAemiNEXofJsTwTyHmNb/iL3dP/sZJ4+7sOld1uqYJtE\" crossorigin=\"anonymous\">\n\n  </head>\n<body>\n\n<script>\n  SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement || function(toElement) {\n  return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());\n  };\n</script>\n\n    <main class=\"content layout_sidebar\">\n\n      <section id=\"app\">\n\n        <div id=\"header\">\n            <h1>MENU</h1>\n            <span id=\"top-nav\">\n              <button class=\"btn load-example\">Reset Bot</button>\n              <button class=\"btn preview-dialog disabled\">Preview Bot</button>\n            </span>\n        </div>\n\n        <div id=\"main\">\n\n          <div id=\"toolbar\">\n            <h4>BOTS</h4>\n            <span id=\"toolbar-buttons-span\">\n              <button class=\"btn add-question\">Question</button>\n              <button class=\"btn add-answer\">Message</button>\n              <button class=\"btn add-icon\">Avatars</button>\n              <!--<button class=\"btn code-snippet\">Code Snippet</button>-->\n              <!--<button class=\"btn clear\">Clear Canvas</button>-->\n            </span>\n          </div>\n\n          <div id=\"paper\"></div>\n\n          <div id=\"statusbar\">\n            <span class=\"message\"></span>\n          </div>\n\n          <div id=\"preview\" class=\"preview\">\n          </div>\n\n        </div><!-- END #main -->\n\n      </section>\n\n    </main>\n\n    <!--<script src=\"/custom_pages/botbuilder/vendor/jquery/jquery.min.js\"></script>-->\n    <script src=\"/custom_pages/botbuilder/vendor/lodash/lodash.min.js\"></script>\n    <script src=\"/custom_pages/botbuilder/vendor/backbone/backbone-min.js\"></script>\n    <!--<script src=\"/custom_pages/botbuilder/rappid/v1.6/rappid.min.js\"></script>-->\n    <script src=\"/custom_pages/botbuilder/jointjs/joint.js\"></script>\n\n    <script src=\"/custom_pages/botbuilder/src/joint.shapes.qad.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/selection.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/factory.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/snippet.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/app.js\"></script>\n    <script src=\"/custom_pages/botbuilder/src/index.js\"></script>\n  </body>\n</html>";
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -641,7 +690,7 @@ function chatboxConfigController($stateParams, notification, Restangular, $http,
 
 exports.default = chatboxConfigController;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -651,7 +700,7 @@ var chatboxConfigControllerTemplate = '<style>input{margin-bottom:10px;}' + '.co
 
 exports.default = chatboxConfigControllerTemplate;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -829,7 +878,7 @@ exports.default = conversationReplyController;
 
 conversationReplyController.$inject = ['$stateParams', 'notification', 'Restangular', '$q'];
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -839,7 +888,7 @@ var conversationReplyTemplate = '<style>input{margin-bottom:10px;}.dont-break-ou
 
 exports.default = conversationReplyTemplate;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 module.exports = function (admin) {
@@ -857,7 +906,7 @@ module.exports = function (admin) {
     return admin;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = function (myApp) {
@@ -942,7 +991,7 @@ module.exports = function (myApp) {
 	return myApp;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -1173,7 +1222,7 @@ module.exports = function (myApp) {
 	});
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 var _chatboxconfig = require('./custom_pages/chatboxconfig/chatboxconfig');
@@ -1223,6 +1272,10 @@ var _obj_key_value_field_view2 = _interopRequireDefault(_obj_key_value_field_vie
 var _obj_key_value_field_directive = require('./custom_fields/obj_key_value/obj_key_value_field_directive');
 
 var _obj_key_value_field_directive2 = _interopRequireDefault(_obj_key_value_field_directive);
+
+var _show_patient_messages = require('./custom_directives/show_patient_messages');
+
+var _show_patient_messages2 = _interopRequireDefault(_show_patient_messages);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1318,14 +1371,16 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     nga.registerFieldType('stamplay_array_str', _stamplay_array_str_field_config2.default);
     nga.registerFieldType('obj_key_value_field', _obj_key_value_field_conf2.default);
 }]);
+
 myApp.config(['FieldViewConfigurationProvider', function (fvp) {
     fvp.registerFieldView('stamplay_array_str', _stamplay_array_str_view2.default);
     fvp.registerFieldView('obj_key_value_field', _obj_key_value_field_view2.default);
 }]);
+
 myApp.directive('stamplayArrStrings', _stamplay_array_str_directive2.default);
 myApp.directive('objKeyValueField', _obj_key_value_field_directive2.default);
-
 myApp.directive('dashboardSummary', require('./custom_dashboard/dashboardSummary'));
+myApp.directive('showPatientMessages', _show_patient_messages2.default);
 
 myApp.directive('replyToChatConversation', ['$location', function ($location) {
     return {
@@ -1414,7 +1469,8 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
 
     admin.menu(nga.menu().addChild(nga.menu().title('Dashboard').icon('<span class="glyphicon glyphicon-calendar"></span>&nbsp;').link('/dashboard'))
     //.addChild(nga.menu(nga.entity('users')).title('Users').icon('<span class="glyphicon glyphicon-user"></span>&nbsp;'))
-    .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatbot')).title('Chat Bot').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('botdialog')).title('Bot Dialog').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatstyle')).title('Chat Style').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+    .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))).addChild(nga.menu().title('ChatBox').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('chatstyle')).title('Chat Style').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))).addChild(nga.menu().title('Bot').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;').addChild(nga.menu(nga.entity('chatbot')).title('Chat Bot').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;')).addChild(nga.menu(nga.entity('botdialog')).title('Bot Dialog').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+
     //.addChild(nga.menu().title('Bot Builder').icon('<span class="glyphicon glyphicon-tower"></span>&nbsp;').link('/botbuilder'))
     ).addChild(nga.menu(nga.entity('articles')).title('Blog Posts').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')));
 
@@ -1446,7 +1502,7 @@ myApp.config(['NgAdminConfigurationProvider', function (nga) {
     nga.configure(admin);
 }]);
 
-},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_fields/obj_key_value/obj_key_value_field_conf":4,"./custom_fields/obj_key_value/obj_key_value_field_directive":5,"./custom_fields/obj_key_value/obj_key_value_field_view":6,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":9,"./custom_pages/botbuilder/botbuilderController":10,"./custom_pages/botbuilder/index":11,"./custom_pages/chatboxconfig/chatboxconfig":12,"./custom_pages/chatboxconfig/chatboxconfigtemplate":13,"./custom_pages/conversation_reply/replyconfig":14,"./custom_pages/conversation_reply/replytemplate":15,"./globalNgadminCode/errorHandlers/adminErrorHandler":16,"./globalNgadminCode/errorHandlers/appLevelErrorHandlers":17,"./globalNgadminCode/interceptors/stamplay":18,"./models/articles":20,"./models/botdialog":21,"./models/chatbot":22,"./models/chatbox":23,"./models/chatroom":24,"./models/chatroomreplies":25,"./models/chatstyle":26,"./models/users":27}],20:[function(require,module,exports){
+},{"./custom_dashboard/dashboardSummary":1,"./custom_dashboard/main":3,"./custom_directives/show_patient_messages":4,"./custom_fields/obj_key_value/obj_key_value_field_conf":5,"./custom_fields/obj_key_value/obj_key_value_field_directive":6,"./custom_fields/obj_key_value/obj_key_value_field_view":7,"./custom_fields/stamplay_array_str_field/stamplay_array_str_directive":8,"./custom_fields/stamplay_array_str_field/stamplay_array_str_field_config":9,"./custom_fields/stamplay_array_str_field/stamplay_array_str_view":10,"./custom_pages/botbuilder/botbuilderController":11,"./custom_pages/botbuilder/index":12,"./custom_pages/chatboxconfig/chatboxconfig":13,"./custom_pages/chatboxconfig/chatboxconfigtemplate":14,"./custom_pages/conversation_reply/replyconfig":15,"./custom_pages/conversation_reply/replytemplate":16,"./globalNgadminCode/errorHandlers/adminErrorHandler":17,"./globalNgadminCode/errorHandlers/appLevelErrorHandlers":18,"./globalNgadminCode/interceptors/stamplay":19,"./models/articles":21,"./models/botdialog":22,"./models/chatbot":23,"./models/chatbox":24,"./models/chatroom":25,"./models/chatroomreplies":26,"./models/chatstyle":27,"./models/users":28}],21:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, articles) {
@@ -1470,25 +1526,19 @@ module.exports = function (nga, articles) {
     return articles;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, botdialog) {
 
     // LIST VIEW
-    botdialog.listView().fields([nga.field('id'), nga.field('dt_create').label('Created'), nga.field('name')]).listActions(['show', 'edit', 'delete']).title('Bot Dialog Nodes');
+    botdialog.listView().fields([nga.field('id'), nga.field('dt_create').label('Created'), nga.field('name'), nga.field('qcode')]).listActions(['show', 'edit', 'delete']).title('Bot Dialog Nodes');
 
     // SHOW VIEW
     botdialog.showView().fields([nga.field('owner'), nga.field('user_owner'), nga.field('dt_create').label('Created'), nga.field('dt_update').label('Last Updated'), nga.field('name'), nga.field('qcode'), nga.field('stuff', 'json')]);
 
     // CREATION VIEW
-    botdialog.creationView().fields([
-    // nga.field('chat_avatar'),
-    // nga.field('chat_color'),
-    // nga.field('chat_headline'),
-    // nga.field('chat_snippet'),
-    // nga.field('chat_url')
-    nga.field('configuration')]);
+    botdialog.creationView().fields([nga.field('name'), nga.field('qcode'), nga.field('stuff', 'json')]);
 
     // EDITION VIEW
     botdialog.editionView().fields(botdialog.creationView().fields());
@@ -1496,7 +1546,7 @@ module.exports = function (nga, botdialog) {
     return botdialog;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, chatbot) {
@@ -1516,7 +1566,7 @@ module.exports = function (nga, chatbot) {
     return chatbot;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, chatbox, chatstyle, chatroom) {
@@ -1585,7 +1635,7 @@ module.exports = function (nga, chatbox, chatstyle, chatroom) {
     return chatbox;
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, chatroom, chatReplies) {
@@ -1595,12 +1645,14 @@ module.exports = function (nga, chatroom, chatReplies) {
     // .disable()
 
     // LIST VIEW
-    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"ask for email"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show', 'delete'])
+    chatroom.listView().fields([nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"ask for email"}').cssClasses(['obj_key_value_field']), nga.field('messages', 'obj_key_value_field').label('Email').keyValueChoices('{"qCode":"scored the email"}').cssClasses(['obj_key_value_field'])]).title('Conversations').listActions(['show', 'delete'])
     //.batchActions([])
     .filters([nga.field('dt_create').label('Created'), nga.field('messages')]);
 
     // SHOW VIEW
-    chatroom.showView().fields([nga.field('user_owner'), nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy, HH:mm:ss'), nga.field('dt_update', 'datetime').label('Last Updated').format('MM/dd/yyyy, HH:mm:ss'), nga.field('messages', 'stamplay_array_str').label('Conversation Details').targetFields([nga.field('source'), nga.field('message.body.text')]).jsonParse(true).fieldValueStyles('[{"fieldName":"source", "value":"patient", "cssClass":"chat-message-source-patient"}]').cssClasses(['short-scroll']), nga.field('custom_action').label('').template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>'), nga.field('replies', 'referenced_list').label('Replies').targetEntity(chatReplies).targetReferenceField(nga.field('chatRoomId')).targetFields([nga.field('dt_create', 'datetime').label('Posted'), nga.field('replyText', 'wysiwyg').label('Detail').isDetailLink('true')
+    chatroom.showView().fields([nga.field('id'), nga.field('owner'), nga.field('user_owner'), nga.field('dt_create', 'datetime').label('Created').format('MM/dd/yyyy, HH:mm:ss'), nga.field('dt_update', 'datetime').label('Last Updated').format('MM/dd/yyyy, HH:mm:ss'), nga.field('messages', 'obj_key_value_field').label('Question').keyValueChoices('{"qCode":"ask for email"}').cssClasses(['obj_key_value_field']), nga.field('messages', 'obj_key_value_field').label('Email').keyValueChoices('{"qCode":"scored the email"}').cssClasses(['obj_key_value_field']), nga.field('messages').label('Messages From Patient').template('<show-patient-messages></show-patient-messages>')
+    // ,nga.field('messages','json')
+    , nga.field('custom_action').label('').template('<reply-to-chat-conversation post="entry"></reply-to-chat-conversation>'), nga.field('replies', 'referenced_list').label('Replies').targetEntity(chatReplies).targetReferenceField(nga.field('chatRoomId')).targetFields([nga.field('dt_create', 'datetime').label('Posted'), nga.field('replyText', 'wysiwyg').label('Detail').isDetailLink('true')
     // .map(function truncate(value, entry) {
     //     return value + '(' + entry.values.subValue + ')';
     // })
@@ -1609,7 +1661,7 @@ module.exports = function (nga, chatroom, chatReplies) {
     return chatroom;
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, chatroomreplies, chatRoom) {
@@ -1642,7 +1694,7 @@ module.exports = function (nga, chatroomreplies, chatRoom) {
     return chatroomreplies;
 };
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, chatstyle) {
@@ -1668,7 +1720,7 @@ module.exports = function (nga, chatstyle) {
     return chatstyle;
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 module.exports = function (nga, users) {
@@ -1688,7 +1740,7 @@ module.exports = function (nga, users) {
     return users;
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1971,7 +2023,7 @@ var Entity = function () {
 
 exports.default = Entity;
 
-},{"../Field/Field":31,"../Utils/stringUtils":35,"../View/BatchDeleteView":36,"../View/CreateView":37,"../View/DashboardView":38,"../View/DeleteView":39,"../View/EditView":40,"../View/ExportView":41,"../View/ListView":42,"../View/MenuView":43,"../View/ShowView":44}],29:[function(require,module,exports){
+},{"../Field/Field":32,"../Utils/stringUtils":36,"../View/BatchDeleteView":37,"../View/CreateView":38,"../View/DashboardView":39,"../View/DeleteView":40,"../View/EditView":41,"../View/ExportView":42,"../View/ListView":43,"../View/MenuView":44,"../View/ShowView":45}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2087,7 +2139,7 @@ var Entry = function () {
 
 exports.default = Entry;
 
-},{"./Utils/objectProperties":33}],30:[function(require,module,exports){
+},{"./Utils/objectProperties":34}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2265,7 +2317,7 @@ var EmbeddedListField = function (_Field) {
 
 exports.default = EmbeddedListField;
 
-},{"../Entity/Entity":28,"./Field":31}],31:[function(require,module,exports){
+},{"../Entity/Entity":29,"./Field":32}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2568,7 +2620,7 @@ var Field = function () {
 
 exports.default = Field;
 
-},{"../Utils/stringUtils":35}],32:[function(require,module,exports){
+},{"../Utils/stringUtils":36}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2616,7 +2668,7 @@ exports.default = {
     }
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2714,7 +2766,7 @@ function cloneAndNest(object) {
     }, {});
 }
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2735,7 +2787,7 @@ exports.default = {
     }
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2760,7 +2812,7 @@ exports.default = {
     }
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2797,7 +2849,7 @@ var BatchDeleteView = function (_View) {
 
 exports.default = BatchDeleteView;
 
-},{"./View":45}],37:[function(require,module,exports){
+},{"./View":46}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2942,7 +2994,7 @@ var CreateView = function (_View) {
 
 exports.default = CreateView;
 
-},{"./View":45}],38:[function(require,module,exports){
+},{"./View":46}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2988,7 +3040,7 @@ var DashboardView = function (_ListView) {
 
 exports.default = DashboardView;
 
-},{"./ListView":42}],39:[function(require,module,exports){
+},{"./ListView":43}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3025,7 +3077,7 @@ var DeleteView = function (_View) {
 
 exports.default = DeleteView;
 
-},{"./View":45}],40:[function(require,module,exports){
+},{"./View":46}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3169,7 +3221,7 @@ var EditView = function (_View) {
 
 exports.default = EditView;
 
-},{"./View":45}],41:[function(require,module,exports){
+},{"./View":46}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3206,7 +3258,7 @@ var ExportView = function (_ListView) {
 
 exports.default = ExportView;
 
-},{"./ListView":42}],42:[function(require,module,exports){
+},{"./ListView":43}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3476,7 +3528,7 @@ var ListView = function (_View) {
 
 exports.default = ListView;
 
-},{"../Utils/orderElement":34,"./View":45}],43:[function(require,module,exports){
+},{"../Utils/orderElement":35,"./View":46}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3537,7 +3589,7 @@ var MenuView = function (_View) {
 
 exports.default = MenuView;
 
-},{"./View":45}],44:[function(require,module,exports){
+},{"./View":46}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3573,7 +3625,7 @@ var ShowView = function (_View) {
 
 exports.default = ShowView;
 
-},{"./View":45}],45:[function(require,module,exports){
+},{"./View":46}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3968,7 +4020,7 @@ var View = function () {
 
 exports.default = View;
 
-},{"../Entry":29,"../Utils/ReferenceExtractor":32,"../Utils/objectProperties":33}],46:[function(require,module,exports){
+},{"../Entry":30,"../Utils/ReferenceExtractor":33,"../Utils/objectProperties":34}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4084,4 +4136,4 @@ var Entry = function () {
 
 exports.default = Entry;
 
-},{"./Utils/objectProperties":33}]},{},[19]);
+},{"./Utils/objectProperties":34}]},{},[20]);

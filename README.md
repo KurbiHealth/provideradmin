@@ -7,7 +7,7 @@ TO DO
 
 INSTALLATION
 ---
-
+  
 After cloning repository locally, run 
 `npm install` 
 to make sure all node modules are available locally. Then run 

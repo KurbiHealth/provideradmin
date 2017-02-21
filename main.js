@@ -104,19 +104,23 @@ import ObjKeyValueFieldConf      from './custom_fields/obj_key_value/obj_key_val
 import ObjKeyValueFieldView      from './custom_fields/obj_key_value/obj_key_value_field_view';
 import ObjKeyValueFieldDirective from './custom_fields/obj_key_value/obj_key_value_field_directive';
 
+import showPatientMessagesDirective from './custom_directives/show_patient_messages';
+
 // REGISTER THE CUSTOM FIELDS
 myApp.config(['NgAdminConfigurationProvider', function(nga) {
     nga.registerFieldType('stamplay_array_str', StamplayArrayStrField);
     nga.registerFieldType('obj_key_value_field', ObjKeyValueFieldConf);
 }]);
+
 myApp.config(['FieldViewConfigurationProvider', function(fvp) {
     fvp.registerFieldView('stamplay_array_str', StamplayArrayStrFieldView);
     fvp.registerFieldView('obj_key_value_field', ObjKeyValueFieldView);
 }]);
+
 myApp.directive('stamplayArrStrings', stamplayArrayOfStringsDirective);
 myApp.directive('objKeyValueField', ObjKeyValueFieldDirective);
-
 myApp.directive('dashboardSummary', require('./custom_dashboard/dashboardSummary'));
+myApp.directive('showPatientMessages', showPatientMessagesDirective);
 
 myApp.directive('replyToChatConversation', ['$location', function ($location) {
     return {
@@ -224,10 +228,15 @@ myApp.config(['NgAdminConfigurationProvider', function(nga) {
         .addChild(nga.menu().title('Chat').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')
             .addChild(nga.menu(nga.entity('chatroom')).title('Conversations').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('chatroomreplies')).title('Replies').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+        )
+        .addChild(nga.menu().title('ChatBox').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')
             .addChild(nga.menu(nga.entity('chatbox')).title('ChatBox').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
+            .addChild(nga.menu(nga.entity('chatstyle')).title('Chat Style').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))         
+        )
+        .addChild(nga.menu().title('Bot').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;')
             .addChild(nga.menu(nga.entity('chatbot')).title('Chat Bot').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
             .addChild(nga.menu(nga.entity('botdialog')).title('Bot Dialog').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))
-            .addChild(nga.menu(nga.entity('chatstyle')).title('Chat Style').icon('<span class="glyphicon glyphicon-lamp"></span>&nbsp;'))         
+
             //.addChild(nga.menu().title('Bot Builder').icon('<span class="glyphicon glyphicon-tower"></span>&nbsp;').link('/botbuilder'))
         )
         .addChild(nga.menu(nga.entity('articles')).title('Blog Posts').icon('<span class="glyphicon glyphicon-education"></span>&nbsp;'))

@@ -6,7 +6,8 @@ module.exports = function(nga,botdialog) {
         nga.field('id'),
         nga.field('dt_create')
             .label('Created'),
-        nga.field('name')
+        nga.field('name'),
+        nga.field('qcode')
     ])
     .listActions(['show','edit','delete'])
     .title('Bot Dialog Nodes');
@@ -28,12 +29,9 @@ module.exports = function(nga,botdialog) {
     // CREATION VIEW
     botdialog.creationView()
     .fields([
-        // nga.field('chat_avatar'),
-        // nga.field('chat_color'),
-        // nga.field('chat_headline'),
-        // nga.field('chat_snippet'),
-        // nga.field('chat_url')
-        nga.field('configuration')
+        nga.field('name'),
+        nga.field('qcode'),
+        nga.field('stuff','json')
     ])
 
     // EDITION VIEW

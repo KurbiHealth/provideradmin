@@ -18,24 +18,26 @@ export default function ObjKeyValueFieldDirective(FieldViewConfiguration, $compi
             // '{"qCode":"back pain details"}'
             var choices = JSON.parse(field._keyValueChoices);
             var messages = scope.entry.values.messages;
-            var displayValue = '--User did not leave a question--';
-            if(messages){
+            var displayValue = '--NONE--';
+            scope.highlightQuestion = '';
 
+            if(messages){
                 messages.map(function(currMessage){
 // TO DO: to make this more universally useful, take out hard coded references to 'patient' and 'qCode'
-                    currMessage = JSON.parse(currMessage);
+                    if(typeof currMessage != 'object')
+                        currMessage = JSON.parse(currMessage);
                     if(currMessage.source == 'patient'){
                         if(currMessage.message.qCode){
                             if(currMessage.message.qCode == choices.qCode){
                                 if(currMessage.message.body.text != ''){
                                     displayValue = currMessage.message.body.text;
+                                    scope.highlightQuestion = 'highlight-question';
                                 }
                             }
                         }
                     }
 
                 });
-            
             }
             scope.displayValue = displayValue;
 
@@ -45,11 +47,12 @@ export default function ObjKeyValueFieldDirective(FieldViewConfiguration, $compi
 
             const template =
 `<div id="row-{{ field.name() }}" class="form-field form-group has-feedback" ng-class="" style="margin:0;">
+    <style>.highlight-question{font-weight: 700;}</style>
     <label for="{{ field.name() }}" class="col-sm-2 control-label">
         {{ field.label() }}
     </label>
     <div ng-class="field.getCssClasses(entry)||'col-sm-10'">
-        {{displayValue}}
+        <span ng-class="highlightQuestion">{{displayValue}}</span>
     </div>
 </div>`;
 

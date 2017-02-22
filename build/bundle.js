@@ -1311,8 +1311,8 @@ errorHandlers(myApp);
  * http://ng-admin-book.marmelab.com/doc/Custom-pages.html
  ***************************************/
 
-//myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
-myApp.constant('chatServerURL', 'http://kchat:3000/chatbox');
+myApp.constant('chatServerURL', 'http://chat.gokurbi.com/chatbox');
+// myApp.constant('chatServerURL', 'http://kchat:3000/chatbox');
 
 // CHATBOX CUSTOMIZATION PAGE
 
